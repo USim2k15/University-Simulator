@@ -8,6 +8,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -34,7 +35,7 @@ public class Menu{
 		
 		if(flag == 0){
 			try {
-				br = new BufferedReader(new FileReader("C:/vnegative.txt"));
+				br = new BufferedReader(new FileReader("vnegative.txt"));
 				
 				String sCurrentLine;
 				while((sCurrentLine = br.readLine()) != null){
@@ -57,7 +58,7 @@ public class Menu{
 		}
 		if(flag == 1){
 			try {
-				br = new BufferedReader(new FileReader("C:/negative.txt"));
+				br = new BufferedReader(new FileReader("negative.txt"));
 				
 				String sCurrentLine;
 				while((sCurrentLine = br.readLine()) != null){
@@ -76,7 +77,7 @@ public class Menu{
 		}
 		if(flag == 2){
 			try {
-				br = new BufferedReader(new FileReader("C:/positive.txt"));
+				br = new BufferedReader(new FileReader("positive.txt"));
 				
 				String sCurrentLine;
 				while((sCurrentLine = br.readLine()) != null){
@@ -95,7 +96,7 @@ public class Menu{
 		}
 		if(flag == 3){
 			try {
-				br = new BufferedReader(new FileReader("C:/vpositive.txt"));
+				br = new BufferedReader(new FileReader("vpositive.txt"));
 				
 				String sCurrentLine;
 				while((sCurrentLine = br.readLine()) != null){
