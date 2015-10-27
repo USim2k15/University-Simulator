@@ -45,7 +45,8 @@ public class USim2k15 extends ApplicationAdapter {
 		List<Sprite> sprites = uLogic.getSprites();
 		List<TextDisplay> fonts = new ArrayList<TextDisplay>();
 		fonts.addAll(uLogic.twitFonts);
-		fonts.addAll(uLogic.fonts);
+		fonts.addAll(uLogic.statsFonts);
+		fonts.addAll(uLogic.selectorFonts);
 		
 		Gdx.gl.glClearColor(1, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);

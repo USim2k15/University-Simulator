@@ -34,8 +34,9 @@ public class ULogic {
 	
 	//Sprite lists
 	List<Building> buildings;
-	List<TextDisplay> fonts;
+	List<TextDisplay> statsFonts;
 	List<TextDisplay> twitFonts;
+	List<TextDisplay> selectorFonts;
 	
 	Menu menu = new Menu();
 	
@@ -116,18 +117,18 @@ public class ULogic {
 		//initialize lists
 		buildings = new ArrayList<Building>();
 		//menus = new ArrayList<Menu>();
-		fonts = new ArrayList<TextDisplay>();
+		statsFonts = new ArrayList<TextDisplay>();
 		twitFonts = new ArrayList<TextDisplay>();
 		
 		//add text
-		fonts.add(new TextDisplay(Integer.toString(money), 975, 715, 180, 2)); //fonts.get(0)
+		statsFonts.add(new TextDisplay(Integer.toString(money), 975, 715, 180, 2)); //fonts.get(0)
 		
 		twitMessage = (menu.getNewTwitMessage(happiness)); //initialize
 		twitFonts.add(new TextDisplay(twitMessage, 15, 170, 180, 1));
 		
-		fonts.add(new TextDisplay("Students: " + Integer.toString(students), 930, 100, 330, 2)); //fonts.get(1)
-		fonts.add(new TextDisplay("Capacity: " + Integer.toString(capacity), 930, 150, 330, 2)); //fonts.get(2)
-		fonts.add(new TextDisplay("Happiness: " + Integer.toString(happiness), 930, 50, 330, 2)); //fonts.get(3)
+		statsFonts.add(new TextDisplay("Students: " + Integer.toString(students), 930, 100, 330, 2)); //statsFonts.get(1)
+		statsFonts.add(new TextDisplay("Capacity: " + Integer.toString(capacity), 930, 150, 330, 2)); //statsFonts.get(2)
+		statsFonts.add(new TextDisplay("Happiness: " + Integer.toString(happiness), 930, 50, 330, 2)); //statsFonts.get(3)
 		
 	}
 	
@@ -139,10 +140,10 @@ public class ULogic {
 		money+=tuition*students/3650;
 		money-= upkeep *0.01; //can multiple if crazy
 		//money+=500;
-		fonts.get(0).text = Integer.toString(money);
-		fonts.get(1).text = "Students: " + Integer.toString(students);
-		fonts.get(2).text = "Capacity: " + Integer.toString(capacity);
-		fonts.get(3).text = "Happiness: " + Integer.toString(happiness);
+		statsFonts.get(0).text = Integer.toString(money);
+		statsFonts.get(1).text = "Students: " + Integer.toString(students);
+		statsFonts.get(2).text = "Capacity: " + Integer.toString(capacity);
+		statsFonts.get(3).text = "Happiness: " + Integer.toString(happiness);
 		
 		if(randit_twit == rand_twit){
 			twitMessage = (menu.getNewTwitMessage(happiness));
@@ -351,6 +352,7 @@ public class ULogic {
 		if(Gdx.input.isKeyPressed(Input.Keys.NUM_1)){
 			buildingSelector = 1;
 			buildingSelectorSprite = t_admin1;
+			//selectorFonts.add(new TextDisplay("Admin building", ));
 		}else if(Gdx.input.isKeyPressed(Input.Keys.NUM_2)){
 			buildingSelector = 3;
 			buildingSelectorSprite = t_compSci;
