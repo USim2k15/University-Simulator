@@ -55,9 +55,9 @@ public class USim2k15 extends ApplicationAdapter {
 			batch.draw(sprites.get(i).getTexture(), sprites.get(i).getX(), sprites.get(i).getY());
 		}
 		for(int i = 0; i < fonts.size(); i++){
-			float scale = fonts.get(i).scale;
-			font.getData().setScale(scale, scale);
-			font.draw(batch, fonts.get(i).text, fonts.get(i).x, fonts.get(i).y, 180, 1, true);
+			TextDisplay current = fonts.get(i);
+			font.getData().setScale(current.scale, current.scale);
+			font.draw(batch, current.text, current.x, current.y, current.tWidth, 1, true);
 		}
 		batch.end();
 	}

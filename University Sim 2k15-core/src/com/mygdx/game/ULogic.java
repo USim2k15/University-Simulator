@@ -120,14 +120,14 @@ public class ULogic {
 		twitFonts = new ArrayList<TextDisplay>();
 		
 		//add text
-		fonts.add(new TextDisplay(Integer.toString(money),975,715,2)); //fonts.get(0)
+		fonts.add(new TextDisplay(Integer.toString(money), 975, 715, 180, 2)); //fonts.get(0)
 		
 		twitMessage = (menu.getNewTwitMessage(happiness)); //initialize
-		twitFonts.add(new TextDisplay(twitMessage,15,170,1));
+		twitFonts.add(new TextDisplay(twitMessage, 15, 170, 180, 1));
 		
-		fonts.add(new TextDisplay("Students: " + Integer.toString(students), 1000, 100, 2)); //fonts.get(1)
-		fonts.add(new TextDisplay("Capacity: " + Integer.toString(capacity), 1000, 150, 2)); //fonts.get(2)
-		fonts.add(new TextDisplay("Happiness: " + Integer.toString(happiness), 1000, 50, 2)); //fonts.get(3)
+		fonts.add(new TextDisplay("Students: " + Integer.toString(students), 930, 100, 330, 2)); //fonts.get(1)
+		fonts.add(new TextDisplay("Capacity: " + Integer.toString(capacity), 930, 150, 330, 2)); //fonts.get(2)
+		fonts.add(new TextDisplay("Happiness: " + Integer.toString(happiness), 930, 50, 330, 2)); //fonts.get(3)
 		
 	}
 	
@@ -149,7 +149,7 @@ public class ULogic {
 			for(int i = 0; i < twitFonts.size(); i++){
 				twitFonts.get(i).y-=33;
 			}
-			twitFonts.add(0, new TextDisplay(twitMessage,15,170,1));
+			twitFonts.add(0, new TextDisplay(twitMessage, 15, 170, 180, 1));
 			if(twitFonts.size() > 5){
 				twitFonts.remove(5);
 			}
