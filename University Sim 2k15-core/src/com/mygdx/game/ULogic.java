@@ -137,7 +137,7 @@ public class ULogic {
 		if(targetStudents < 0) targetStudents = 0;
 		
 		money+=tuition*students/3650;
-		money-= upkeep *0.1; //can multiple if crazy
+		money-= upkeep *0.01; //can multiple if crazy
 		//money+=500;
 		fonts.get(0).text = Integer.toString(money);
 		fonts.get(1).text = "Students: " + Integer.toString(students);
