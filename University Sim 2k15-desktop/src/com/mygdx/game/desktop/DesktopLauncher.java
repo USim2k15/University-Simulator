@@ -12,7 +12,7 @@ public class DesktopLauncher {
 		config.y = -1;
 		config.width = 1280;
 		config.height = 720;
-		config.fullscreen = true;
+		config.fullscreen = false;
 		
 		config.title = "University Simulator";
 		
