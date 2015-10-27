@@ -26,7 +26,7 @@ public class ULogic {
 	Texture t_bg;
 	Texture t_overlay;
 	//buildings
-	Texture t_admin1, t_admin2, t_compSci, t_genSci, t_engineering, t_math, t_ass, t_res, t_test1;
+	Texture t_admin1, t_admin2, t_compSci, t_genSci, t_engineering, t_math, t_ass, t_res, t_test3;
 	Texture t_adminfull; //only used by building selector
 	final int NUMBER_OF_BUILDINGS = 8;
 	//UI
