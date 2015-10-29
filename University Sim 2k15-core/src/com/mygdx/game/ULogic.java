@@ -307,6 +307,7 @@ public class ULogic {
 	}
 	
 	public void saveData(){
+		//map data
 		try{
 			f_map = new File("C:/USim2k15/map.udat");
 			
@@ -328,9 +329,13 @@ public class ULogic {
 		}catch(IOException e){
 			e.printStackTrace();
 		}
+		
+		//game data
+		
 	}
 	
 	public void loadData(){
+		//map data
 		try{
 			f_map = new File("C:/USim2k15/map.udat");
 			
@@ -359,6 +364,9 @@ public class ULogic {
 		}catch(IOException e){
 			e.printStackTrace();
 		}
+		
+		//game data
+		
 	}
 	
 	public void handleInput(){
