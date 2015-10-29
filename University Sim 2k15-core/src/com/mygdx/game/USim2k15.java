@@ -13,6 +13,8 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.utils.TimeUtils;
+import com.badlogic.gdx.graphics.Texture;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -26,8 +28,15 @@ public class USim2k15 extends ApplicationAdapter {
 	
 	private BitmapFont font;
 	
+	long splashTimer;
+	
+	Texture splash;
+	
 	@Override
 	public void create () {
+		
+		splashTimer = TimeUtils.millis() + 2000;
+		splash = new Texture("splash.jpg");
 		
 		uLogic = new ULogic();
 		
@@ -39,6 +48,17 @@ public class USim2k15 extends ApplicationAdapter {
 
 	@Override
 	public void render () {
+		
+		if(TimeUtils.millis() - splashTimer < 0){
+			
+			batch.begin();
+			
+			batch.draw(splash, 0, 0);
+			
+			batch.end();
+			
+			return;
+		}
 		
 		uLogic.loop();
 		
