@@ -136,7 +136,7 @@ public class Menu{
 	//This method returns the first part of a TwitMessage((c)2k15)
 	private String messages(){
 		String[] templates = {"This school is ","I chose this school because it is so ","The people here are ","#ThisUniversity ","I wish this school wasn't so damn ","Free pizza is ",
-				"This school couldn't be any more ","My life in one word? #","Ugh, exams. #","666 hail Stan 666","WHO IS STAN?!"};
+				"This school couldn't be any more ","My life in one word? #","Ugh, exams. #","666 hail Stan 666 ","WHO IS STAN?! "};
 		int index;
 		index = ThreadLocalRandom.current().nextInt(0,templates.length);
 		String template = templates[index];

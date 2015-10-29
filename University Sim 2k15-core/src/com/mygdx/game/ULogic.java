@@ -151,18 +151,7 @@ public class ULogic {
 		statsFonts.get(2).text = "Capacity: " + Integer.toString(capacity);
 		statsFonts.get(3).text = "Happiness: " + Integer.toString(happiness);
 		
-		if(randit_twit == rand_twit){
-			twitMessage = (menu.getNewTwitMessage(happiness));
-			for(int i = 0; i < twitFonts.size(); i++){
-				twitFonts.get(i).y-=33;
-			}
-			twitFonts.add(0, new TextDisplay(twitMessage, 15, 170, 180, 1));
-			if(twitFonts.size() > 5){
-				twitFonts.remove(5);
-			}
-			randit_twit = 0;
-			rand_twit = ThreadLocalRandom.current().nextInt(30, 150);
-		}
+		if(randit_twit == rand_twit) addTwitMessage();
 		randit_twit++;
 		
 		//this pseudorandom stuff makes students approach the target value (see above, based on 
@@ -355,12 +344,13 @@ public class ULogic {
 				bw.close();
 			}
 			
-			@SuppressWarnings("resource")
 			Scanner in = new Scanner(f_map);
 			
 			while(in.hasNextInt()){
 				mapIndex.add(in.nextInt());
 			}
+			
+			in.close();
 		}catch(IOException e){
 			e.printStackTrace();
 		}
@@ -437,5 +427,18 @@ public class ULogic {
 		if(Gdx.input.justTouched()) 
 			if(buildingSelector != -1)
 				handleClick(Gdx.input.getX(), Gdx.input.getY());
+	}
+	
+	public void addTwitMessage(){
+		twitMessage = (menu.getNewTwitMessage(happiness));
+		for(int i = 0; i < twitFonts.size(); i++){
+			twitFonts.get(i).y-=33;
+		}
+		twitFonts.add(0, new TextDisplay(twitMessage, 15, 170, 180, 1));
+		if(twitFonts.size() > 5){
+			twitFonts.remove(5);
+		}
+		randit_twit = 0;
+		rand_twit = ThreadLocalRandom.current().nextInt(30, 150);
 	}
 }
