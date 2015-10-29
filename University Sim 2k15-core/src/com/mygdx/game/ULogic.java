@@ -308,9 +308,12 @@ public class ULogic {
 	
 	public void saveData(){
 		try{
-			f_map = new File("map.udat");
+			f_map = new File("C:/USim2k15/map.udat");
 			
 			if(!f_map.exists()){
+				File directory = new File(f_map.getParentFile().getAbsolutePath());
+				directory.mkdirs();
+				
 				f_map.createNewFile();
 			}
 			
@@ -329,9 +332,12 @@ public class ULogic {
 	
 	public void loadData(){
 		try{
-			f_map = new File("map.udat");
+			f_map = new File("C:/USim2k15/map.udat");
 			
 			if(!f_map.exists()){
+				File directory = new File(f_map.getParentFile().getAbsolutePath());
+				directory.mkdirs();
+				
 				f_map.createNewFile();
 				
 				FileWriter fw = new FileWriter(f_map.getAbsoluteFile());
