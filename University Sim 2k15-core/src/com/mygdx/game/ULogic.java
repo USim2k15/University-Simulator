@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Color;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -42,8 +41,14 @@ public class ULogic {
 	
 	//Money
 	int money,students,capacity,tuition,happiness, targetStudents, upkeep;
+	//in-game cost constants
+	int COST_ADMIN = 200000, COST_COMPSCI = 100000, COST_GENSCI = 75000, COST_ENGINEERING = 75000, COST_MATH = 75000, COST_ASS = 75000, COST_RES = 500000;
+	
+	//twit message vars
 	String twitMessage;
 	int rand_twit = 0, randit_twit = 0; //random twits vars
+	
+	//building selector view vars
 	int buildingSelector;
 	Texture buildingSelectorSprite;
 	//Font
@@ -96,13 +101,13 @@ public class ULogic {
 		
 		upkeep = 0;
 		
-		loadData();
-		
 		mapIndex = new ArrayList<Integer>();
 		
-		for(int i = 0; i < 41; i++){
+		loadData();
+		
+		/*for(int i = 0; i < 41; i++){
 			mapIndex.add(0);
-		}
+		}*/
 		
 		menu.init();
 		
@@ -111,7 +116,7 @@ public class ULogic {
 		students = 0;
 		capacity = 0;
 		tuition = 100; //= kb.nextInt();
-		happiness = 100;
+		happiness = 50;
 		
 		
 		//initialize lists
@@ -119,6 +124,7 @@ public class ULogic {
 		//menus = new ArrayList<Menu>();
 		statsFonts = new ArrayList<TextDisplay>();
 		twitFonts = new ArrayList<TextDisplay>();
+		selectorFonts = new ArrayList<TextDisplay>();
 		
 		//add text
 		statsFonts.add(new TextDisplay(Integer.toString(money), 975, 715, 180, 2)); //fonts.get(0)
@@ -134,7 +140,7 @@ public class ULogic {
 	
 	public void loop(){ //called in USim2k15.render()
 		
-		targetStudents = capacity - (100-happiness)*50;
+		targetStudents = capacity*(50+happiness)/150;
 		if(targetStudents < 0) targetStudents = 0;
 		
 		money+=tuition*students/3650;
@@ -159,11 +165,12 @@ public class ULogic {
 		}
 		randit_twit++;
 		
+		//this pseudorandom stuff makes students approach the target value (see above, based on 
+		//capacity and happiness) then bounce around the target randomly.
 		if(students != targetStudents){
-			//TODO figure out random student adding
-			students+= ((targetStudents - students) / (ThreadLocalRandom.current().nextInt(50, 100))) + ThreadLocalRandom.current().nextInt(0, 2);
+			students+= ((targetStudents - students) / (ThreadLocalRandom.current().nextInt(1, 1000)));
 			
-		}else students ++;
+		}else students += ThreadLocalRandom.current().nextInt(-15, 15);
 		
 		if(students > capacity) students = capacity;
 		if(students <= 0) students = 0;
@@ -182,9 +189,9 @@ public class ULogic {
 		//sprites.addAll(menus);
 		
 		if(buildingSelector == 1)
-			sprites.add(new Sprite(t_adminfull, 250, 100));
+			sprites.add(new Sprite(t_adminfull, 243, 110));
 		else if(buildingSelectorSprite != null)
-			sprites.add(new Sprite(buildingSelectorSprite, 250, 100));
+			sprites.add(new Sprite(buildingSelectorSprite, 275, 110));
 		
 		return sprites;
 	}
@@ -259,31 +266,31 @@ public class ULogic {
 				if(clickx >= itx && clickx < itx+64 && clicky >= ity && clicky < ity+64){
 					if(mapIndex.get(i) == 0){
 						if(buildingSelector == 1){
-							if(mapIndex.get(i+1) != 0 || i == 19 || i == 39 || money < 200000){ //no room for admin (or not enough $$$)
+							if(mapIndex.get(i+1) != 0 || i == 19 || i == 39 || money < COST_ADMIN){ //no room for admin (or not enough $$$)
 								//trying to set admin building but can't
 							}else{
 								mapIndex.set(i, 1);
 								mapIndex.set(i+1, 2);
 								
-								money -= 200000; //admin cost 200k
+								money -= COST_ADMIN; //admin cost 200k
 								upkeep += 20;
 							}
 						}
 						else {
 							
 							//take off proper cost
-							if(buildingSelector == 3 && money >= 100000){ //computer science
-								money -= 100000;
+							if(buildingSelector == 3 && money >= COST_COMPSCI){ //computer science
+								money -= COST_COMPSCI;
 								upkeep += 150;
 								mapIndex.set(i, buildingSelector);
 							}
-							else if(buildingSelector >= 4 && buildingSelector <= 7 && money >= 75000){ //4-7
-								money -= 75000;
+							else if(buildingSelector >= 4 && buildingSelector <= 7 && money >= COST_GENSCI){ //4-7
+								money -= COST_GENSCI;
 								upkeep += 100;
 								mapIndex.set(i, buildingSelector);
 							}
-							else if(buildingSelector == 8 && money >= 500000){ //res
-								money -= 500000; //student residences are fuckin EXPENSIVE
+							else if(buildingSelector == 8 && money >= COST_RES){ //res
+								money -= COST_RES; //student residences are fuckin EXPENSIVE
 								upkeep += 250;
 								mapIndex.set(i, buildingSelector);
 							}
@@ -301,7 +308,7 @@ public class ULogic {
 	
 	public void saveData(){
 		try{
-			f_map = new File("map.txt");
+			f_map = new File("map.udat");
 			
 			if(!f_map.exists()){
 				f_map.createNewFile();
@@ -310,7 +317,7 @@ public class ULogic {
 			FileWriter fw = new FileWriter(f_map.getAbsoluteFile());
 			BufferedWriter bw = new BufferedWriter(fw);
 			
-			for(int i = 0; i < 48; i++){
+			for(int i = 0; i < mapIndex.size(); i++){
 				bw.write(Integer.toString(mapIndex.get(i)) + " ");
 			}
 			
@@ -322,16 +329,26 @@ public class ULogic {
 	
 	public void loadData(){
 		try{
-			f_map = new File("map.txt");
+			f_map = new File("map.udat");
 			
 			if(!f_map.exists()){
 				f_map.createNewFile();
+				
+				FileWriter fw = new FileWriter(f_map.getAbsoluteFile());
+				BufferedWriter bw = new BufferedWriter(fw);
+				
+				for(int i = 0; i < 40; i++){
+					bw.write(0 + " ");
+				}
+				
+				bw.close();
 			}
 			
+			@SuppressWarnings("resource")
 			Scanner in = new Scanner(f_map);
 			
-			for(int i = 0; in.hasNextInt(); i++){
-				mapIndex.set(i, in.nextInt());
+			while(in.hasNextInt()){
+				mapIndex.add(in.nextInt());
 			}
 		}catch(IOException e){
 			e.printStackTrace();
@@ -347,43 +364,61 @@ public class ULogic {
 			Gdx.graphics.setDisplayMode(1280, 720, false);
 		}
 		
+		if(Gdx.input.isKeyJustPressed(Input.Keys.S)){
+			saveData();
+		}
+		
 		//building selector (can be done better)
 		//what the fuck?
+		String info;
 		if(Gdx.input.isKeyPressed(Input.Keys.NUM_1)){
 			buildingSelector = 1;
-			buildingSelectorSprite = t_admin1;
-			//selectorFonts.add(new TextDisplay("Admin building", ));
+			buildingSelectorSprite = t_adminfull;
+			info = "Admin Building\nPrice: " + COST_ADMIN;
 		}else if(Gdx.input.isKeyPressed(Input.Keys.NUM_2)){
 			buildingSelector = 3;
 			buildingSelectorSprite = t_compSci;
+			info = "Computer Science\nPrice: " + COST_COMPSCI;
 		}else if(Gdx.input.isKeyPressed(Input.Keys.NUM_3)){
 			buildingSelector = 4;
 			buildingSelectorSprite = t_genSci;
+			info = "Science\nPrice: " + COST_GENSCI;
 		}else if(Gdx.input.isKeyPressed(Input.Keys.NUM_4)){
 			buildingSelector = 5;
 			buildingSelectorSprite = t_engineering;
+			info = "Engineering\nPrice: " + COST_ENGINEERING;
 		}else if(Gdx.input.isKeyPressed(Input.Keys.NUM_5)){
 			buildingSelector = 6;
 			buildingSelectorSprite = t_math;
+			info = "Mathematics\nPrice: " + COST_MATH;
 		}else if(Gdx.input.isKeyPressed(Input.Keys.NUM_6)){
 			buildingSelector = 7;
 			buildingSelectorSprite = t_ass;
+			info = "Arts & Social Sciences\nPrice: " + COST_ASS;
 		}else if(Gdx.input.isKeyPressed(Input.Keys.NUM_7)){
 			buildingSelector = 8;
 			buildingSelectorSprite = t_res;
+			info = "Residence\nPrice: " + COST_RES;
 		}else if(Gdx.input.isKeyPressed(Input.Keys.NUM_8)){
 			buildingSelector = -1;
 			buildingSelectorSprite = null;
+			info = "Press and hold a number key to build.";
 		}else if(Gdx.input.isKeyPressed(Input.Keys.NUM_9)){
 			buildingSelector = -1;
 			buildingSelectorSprite = null;
+			info = "Press and hold a number key to build.";
 		}else if(Gdx.input.isKeyPressed(Input.Keys.NUM_0)){
 			buildingSelector = -1;
 			buildingSelectorSprite = null;
+			info = "Press and hold a number key to build.";
 		}else{
 			buildingSelector = -1;
 			buildingSelectorSprite = null;
+			info = "Press and hold a number key to build.";
 		}
+
+		selectorFonts.clear();
+		selectorFonts.add(new TextDisplay(info, 226, 105, 160, 1));
 		
 		if(Gdx.input.justTouched()) 
 			if(buildingSelector != -1)

@@ -62,4 +62,9 @@ public class USim2k15 extends ApplicationAdapter {
 		}
 		batch.end();
 	}
+	
+	@Override
+	public void dispose(){
+		uLogic.saveData();
+	}
 }
