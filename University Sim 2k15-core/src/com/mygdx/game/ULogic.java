@@ -20,21 +20,18 @@ import java.io.IOException;
 
 public class ULogic {
 	
-	//saved file data
-	File f_map;
-	
+	//date vars
 	Date date;
 	SimpleDateFormat ft;
 	
-	final double DAYS_PER_FRAME = 0.1;
+	final double DAYS_PER_FRAME = 0.1; //this actually doesn't have to be final, we can let the user change it to fast forward
 	
-	//background(s)
+	//background
 	Texture t_bg;
 	Texture t_overlay;
 	//buildings
 	Texture t_admin1, t_admin2, t_compSci, t_genSci, t_engineering, t_math, t_ass, t_res, t_test1;
 	Texture t_adminfull; //only used by building selector
-	final int NUMBER_OF_BUILDINGS = 8;
 	//UI
 	Texture t_stats, t_quit;
 	
@@ -312,7 +309,7 @@ public class ULogic {
 	public void saveData(){
 		//map data
 		try{
-			f_map = new File("C:/USim2k15/map.udat");
+			File f_map = new File("C:/USim2k15/map.udat");
 			
 			if(!f_map.exists()){
 				File directory = new File(f_map.getParentFile().getAbsolutePath());
@@ -335,24 +332,22 @@ public class ULogic {
 		
 		//game data
 		try{
-			f_map = new File("C:/USim2k15/save.udat");
+			File f_dat = new File("C:/USim2k15/save.udat");
 			
-			if(!f_map.exists()){
-				File directory = new File(f_map.getParentFile().getAbsolutePath());
+			if(!f_dat.exists()){
+				File directory = new File(f_dat.getParentFile().getAbsolutePath());
 				directory.mkdirs();
 				
-				f_map.createNewFile();
+				f_dat.createNewFile();
 			}
 			
-			FileWriter fw = new FileWriter(f_map.getAbsoluteFile());
+			FileWriter fw = new FileWriter(f_dat.getAbsoluteFile());
 			BufferedWriter bw = new BufferedWriter(fw);
 			
-			for(int i = 0; i < mapIndex.size(); i++){
-				bw.write(money + " ");
-				bw.write(students + " ");
-				bw.write(date.getTime() + " ");
-				bw.write(upkeep + " ");
-			}
+			bw.write(money + " ");
+			bw.write(students + " ");
+			bw.write(date.getTime() + " ");
+			bw.write(upkeep + " ");
 			
 			bw.close();
 		}catch(IOException e){
@@ -363,22 +358,13 @@ public class ULogic {
 	public void loadData(){
 		//map data
 		try{
-			f_map = new File("C:/USim2k15/map.udat");
+			File f_map = new File("C:/USim2k15/map.udat");
 			
 			if(!f_map.exists()){
 				File directory = new File(f_map.getParentFile().getAbsolutePath());
 				directory.mkdirs();
 				
 				f_map.createNewFile();
-				
-				FileWriter fw = new FileWriter(f_map.getAbsoluteFile());
-				BufferedWriter bw = new BufferedWriter(fw);
-				
-				for(int i = 0; i < 40; i++){
-					bw.write(0 + " ");
-				}
-				
-				bw.close();
 			}
 			
 			Scanner in = new Scanner(f_map);
@@ -386,6 +372,8 @@ public class ULogic {
 			while(in.hasNextInt()){
 				mapIndex.add(in.nextInt());
 			}
+			
+			for(int i = mapIndex.size(); i < 40; i++) mapIndex.add(0);
 			
 			in.close();
 		}catch(IOException e){
@@ -399,31 +387,24 @@ public class ULogic {
 		//(no else because it's already initialized to current time)
 		
 		try{
-			f_map = new File("C:/USim2k15/save.udat");
+			File f_dat = new File("C:/USim2k15/save.udat");
 			
-			if(!f_map.exists()){
-				File directory = new File(f_map.getParentFile().getAbsolutePath());
+			if(!f_dat.exists()){
+				File directory = new File(f_dat.getParentFile().getAbsolutePath());
 				directory.mkdirs();
 				
-				f_map.createNewFile();
-				
-				FileWriter fw = new FileWriter(f_map.getAbsoluteFile());
-				BufferedWriter bw = new BufferedWriter(fw);
-				
-				bw.write(1000000 + " " + 0 + " " + 0 + " " + 0);
-				
-				bw.close();
+				f_dat.createNewFile();
 			}
 			
-			Scanner in = new Scanner(f_map);
+			Scanner in = new Scanner(f_dat);
 			
-			if(in.hasNextInt()){
-				money = in.nextInt();
-				students = in.nextInt();
+			if(in.hasNextInt()) money = in.nextInt(); else money = 1000000;
+			if(in.hasNextInt()) students = in.nextInt(); else students = 0;
+			if(in.hasNextLong()){
 				long d = in.nextLong();
 				if(d != 0) date.setTime(d);
-				upkeep = in.nextInt();
-			}
+			} //no else because date is set by default when object is created				
+			if(in.hasNextInt()) upkeep = in.nextInt(); else upkeep = 0;
 			
 			in.close();
 		}catch(IOException e){
