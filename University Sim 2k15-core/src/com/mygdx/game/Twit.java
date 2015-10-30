@@ -150,7 +150,7 @@ public class Twit{
 		for(int i = 0; i < twitFonts.size(); i++){
 			twitFonts.get(i).y-=33;
 		}
-		twitFonts.add(0, new TextDisplay(twitMessage, 15, 170, 180, 1, Color.BLACK));
+		twitFonts.add(0, new TextDisplay(twitMessage, 15, 170, 180, 1, Color.BLACK, 1));
 		if(twitFonts.size() > 5){
 			twitFonts.remove(5);
 		}

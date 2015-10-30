@@ -12,6 +12,7 @@ import java.util.Scanner;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.Date;
 import java.text.SimpleDateFormat;
+import java.text.NumberFormat;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -19,6 +20,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 public class ULogic {
+	
 	
 	//date vars
 	Date date;
@@ -45,14 +47,21 @@ public class ULogic {
 	//Money
 	int money, students, capacity, tuition, happiness, targetStudents, upkeep;
 	//in-game cost constants
-	final int COST_ADMIN = 200000, COST_COMPSCI = 100000, COST_GENSCI = 75000, COST_ENGINEERING = 75000, COST_MATH = 75000, COST_ASS = 75000, COST_RES = 500000;
+	final int COST_ADMIN = 200000, 
+			  COST_COMPSCI = 100000, 
+			  COST_GENSCI = 75000, 
+			  COST_ENGINEERING = 75000, 
+			  COST_MATH = 75000, 
+			  COST_ASS = 75000, 
+			  COST_RES = 500000;
 	
-	//twit message vars
-	int rand_twit = 0, randit_twit = 0; //random twits vars
+	//random twits vars
+	int rand_twit = 0, randit_twit = 0;
 	
 	//building selector view vars
 	int buildingSelector;
 	Texture buildingSelectorSprite;
+	
 	//Font
 	BitmapFont font;
 	
@@ -72,7 +81,7 @@ public class ULogic {
 	
 	int testVar = 0;
 	
-	public ULogic(){ //constructor called in USim2k15.create()
+	public ULogic(){ //constructor called in USim2k15::create()
 		loadImages();
 		init();
 	}
@@ -122,7 +131,7 @@ public class ULogic {
 		//students = 0;
 		capacity = 0;
 		tuition = 100; //= kb.nextInt();
-		happiness = 50;
+		happiness = 100;
 		
 		
 		//initialize lists
@@ -132,15 +141,15 @@ public class ULogic {
 		selectorFonts = new ArrayList<TextDisplay>();
 		
 		//add text
-		statsFonts.add(new TextDisplay(Integer.toString(money), 975, 715, 150, 2, Color.BLACK)); //statsFonts.get(0) //money
-		statsFonts.add(new TextDisplay("Students: " + Integer.toString(students), 930, 100, 330, 2, Color.BLACK)); //statsFonts.get(1)
-		statsFonts.add(new TextDisplay("Capacity: " + Integer.toString(capacity), 930, 150, 330, 2, Color.BLACK)); //statsFonts.get(2)
-		statsFonts.add(new TextDisplay("Happiness: " + Integer.toString(happiness), 930, 50, 330, 2, Color.BLACK)); //statsFonts.get(3)
-		statsFonts.add(new TextDisplay("Date: " + ft.format(date), 5, 710, 330, 1.5f, Color.WHITE)); //statsFonts.get(4)
+		statsFonts.add(new TextDisplay(Integer.toString(money), 975, 715, 0, 2, Color.BLACK, -1)); //statsFonts.get(0) //money
+		statsFonts.add(new TextDisplay("Students: " + Integer.toString(students), 930, 100, 330, 2, Color.BLACK, 1)); //statsFonts.get(1)
+		statsFonts.add(new TextDisplay("Capacity: " + Integer.toString(capacity), 930, 150, 330, 2, Color.BLACK, 1)); //statsFonts.get(2)
+		statsFonts.add(new TextDisplay("Happiness: " + Integer.toString(happiness), 930, 50, 330, 2, Color.BLACK, 1)); //statsFonts.get(3)
+		statsFonts.add(new TextDisplay("Date: " + ft.format(date), 10, 710, 330, 1.5f, Color.WHITE, -1)); //statsFonts.get(4)
 		
 	}
 	
-	public void loop(){ //called in USim2k15.render()
+	public void loop(){ //called in USim2k15::render()
 		
 		compileMap();
 		
@@ -149,8 +158,11 @@ public class ULogic {
 		
 		money += (tuition*students) / (365/DAYS_PER_FRAME);
 		money -= upkeep *0.01; //can multiple if crazy
-		//money+=500;
-		statsFonts.get(0).text = Integer.toString(money);
+		
+		NumberFormat nf = NumberFormat.getInstance();
+		nf.setGroupingUsed(true);
+		
+		statsFonts.get(0).text = nf.format(money);
 		statsFonts.get(1).text = "Students: " + Integer.toString(students);
 		statsFonts.get(2).text = "Capacity: " + Integer.toString(capacity);
 		statsFonts.get(3).text = "Happiness: " + Integer.toString(happiness);
@@ -179,7 +191,7 @@ public class ULogic {
 		date.setTime(date.getTime() + (long)(8.64e+7 * DAYS_PER_FRAME)); 
 	}
 	
-	public List<Sprite> getSprites(){
+	public List<Sprite> getSprites(){ //called by USim2k15, compiles list of sprites to draw each loop
 		List<Sprite> sprites = new ArrayList<Sprite>();
 		sprites.add(new Sprite(t_bg,0,0));
 		sprites.add(new Sprite(t_overlay,0,0));
@@ -194,8 +206,17 @@ public class ULogic {
 		return sprites;
 	}
 	
-	public void compileMap(){
-		if(!(oldMapIndex.equals(mapIndex))){
+	public List<TextDisplay> getFonts(){ //called by USim2k15, compiles list of texts to draw each loop
+		List<TextDisplay> fonts = new ArrayList<TextDisplay>();
+		fonts.addAll(statsFonts);
+		fonts.addAll(selectorFonts);
+		fonts.addAll(twit.twitFonts);
+		
+		return fonts;
+	}
+	
+	public void compileMap(){ //called each loop
+		if(!(oldMapIndex.equals(mapIndex))){ //only does its thing if the map is different
 			capacity = 0;
 			
 			buildings.clear();
@@ -249,7 +270,95 @@ public class ULogic {
 		oldMapIndex.addAll(mapIndex);
 	}
 	
-	public void handleClick(int clickx, int clicky){
+	public void handleInput(){
+		//dev tools
+		if(Gdx.input.isKeyPressed(Input.Keys.NUMPAD_8)){
+			money+=100000;
+		}
+		
+		
+		if(Gdx.input.isKeyJustPressed(Input.Keys.F)){
+			Gdx.graphics.setDisplayMode(1280, 720, true);
+		}
+		
+		if(Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)){
+			Gdx.graphics.setDisplayMode(1280, 720, false);
+		}
+		
+		if(Gdx.input.isKeyJustPressed(Input.Keys.S)){
+			saveData();
+		}
+		
+		if(Gdx.input.isKeyJustPressed(Input.Keys.R)){
+			money = 1000000;
+			upkeep = 0;
+			students = 0;
+			date = new Date();
+			for(int i = 0; i < 40; i++){
+				mapIndex.set(i, 0);
+			}
+		}
+		
+		//building selector (can be done better)
+		//what the fuck?
+		String info;
+		if(Gdx.input.isKeyPressed(Input.Keys.NUM_1)){
+			buildingSelector = 1;
+			buildingSelectorSprite = t_adminfull;
+			info = "Admin Building\nPrice: " + COST_ADMIN;
+		}else if(Gdx.input.isKeyPressed(Input.Keys.NUM_2)){
+			buildingSelector = 3;
+			buildingSelectorSprite = t_compSci;
+			info = "Computer Science\nPrice: " + COST_COMPSCI;
+		}else if(Gdx.input.isKeyPressed(Input.Keys.NUM_3)){
+			buildingSelector = 4;
+			buildingSelectorSprite = t_genSci;
+			info = "Science\nPrice: " + COST_GENSCI;
+		}else if(Gdx.input.isKeyPressed(Input.Keys.NUM_4)){
+			buildingSelector = 5;
+			buildingSelectorSprite = t_engineering;
+			info = "Engineering\nPrice: " + COST_ENGINEERING;
+		}else if(Gdx.input.isKeyPressed(Input.Keys.NUM_5)){
+			buildingSelector = 6;
+			buildingSelectorSprite = t_math;
+			info = "Mathematics\nPrice: " + COST_MATH;
+		}else if(Gdx.input.isKeyPressed(Input.Keys.NUM_6)){
+			buildingSelector = 7;
+			buildingSelectorSprite = t_ass;
+			info = "Arts & Social Sciences\nPrice: " + COST_ASS;
+		}else if(Gdx.input.isKeyPressed(Input.Keys.NUM_7)){
+			buildingSelector = 8;
+			buildingSelectorSprite = t_res;
+			info = "Residence\nPrice: " + COST_RES;
+		}else if(Gdx.input.isKeyPressed(Input.Keys.NUM_8)){
+			buildingSelector = -1;
+			buildingSelectorSprite = null;
+			info = "Press and hold a number key to build.";
+		}else if(Gdx.input.isKeyPressed(Input.Keys.NUM_9)){
+			buildingSelector = -1;
+			buildingSelectorSprite = null;
+			info = "Press and hold a number key to build.";
+		}else if(Gdx.input.isKeyPressed(Input.Keys.NUM_0)){
+			buildingSelector = -1;
+			buildingSelectorSprite = null;
+			info = "Press and hold a number key to build.";
+		}else{
+			buildingSelector = -1;
+			buildingSelectorSprite = null;
+			info = "Press and hold a number key to build.";
+		}
+
+		selectorFonts.clear();
+		selectorFonts.add(new TextDisplay(info, 226, 105, 160, 1, Color.BLACK, 1));
+		
+		if(Gdx.input.justTouched()) 
+			if(buildingSelector != -1)
+				handleClick(Gdx.input.getX(), Gdx.input.getY());
+			//else{ }
+				//deal with normal click
+	}
+	
+	public void handleClick(int clickx, int clicky){ //called from handleInput()
 
 		
 		if((clicky >= 214 && clicky < 278) || (clicky >= 424 && clicky < 488)){
@@ -303,6 +412,8 @@ public class ULogic {
 			}
 		}
 	}
+	
+	///save and load data from files
 	
 	public void saveData(){
 		//map data
@@ -408,86 +519,5 @@ public class ULogic {
 		}catch(IOException e){
 			e.printStackTrace();
 		}
-		
-	}
-	
-	public void handleInput(){
-		if(Gdx.input.isKeyJustPressed(Input.Keys.F)){
-			Gdx.graphics.setDisplayMode(1280, 720, true);
-		}
-		
-		if(Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)){
-			Gdx.graphics.setDisplayMode(1280, 720, false);
-		}
-		
-		if(Gdx.input.isKeyJustPressed(Input.Keys.S)){
-			saveData();
-		}
-		
-		if(Gdx.input.isKeyJustPressed(Input.Keys.R)){
-			money = 1000000;
-			upkeep = 0;
-			students = 0;
-			date = new Date();
-			for(int i = 0; i < 40; i++){
-				mapIndex.set(i, 0);
-			}
-		}
-		
-		//building selector (can be done better)
-		//what the fuck?
-		String info;
-		if(Gdx.input.isKeyPressed(Input.Keys.NUM_1)){
-			buildingSelector = 1;
-			buildingSelectorSprite = t_adminfull;
-			info = "Admin Building\nPrice: " + COST_ADMIN;
-		}else if(Gdx.input.isKeyPressed(Input.Keys.NUM_2)){
-			buildingSelector = 3;
-			buildingSelectorSprite = t_compSci;
-			info = "Computer Science\nPrice: " + COST_COMPSCI;
-		}else if(Gdx.input.isKeyPressed(Input.Keys.NUM_3)){
-			buildingSelector = 4;
-			buildingSelectorSprite = t_genSci;
-			info = "Science\nPrice: " + COST_GENSCI;
-		}else if(Gdx.input.isKeyPressed(Input.Keys.NUM_4)){
-			buildingSelector = 5;
-			buildingSelectorSprite = t_engineering;
-			info = "Engineering\nPrice: " + COST_ENGINEERING;
-		}else if(Gdx.input.isKeyPressed(Input.Keys.NUM_5)){
-			buildingSelector = 6;
-			buildingSelectorSprite = t_math;
-			info = "Mathematics\nPrice: " + COST_MATH;
-		}else if(Gdx.input.isKeyPressed(Input.Keys.NUM_6)){
-			buildingSelector = 7;
-			buildingSelectorSprite = t_ass;
-			info = "Arts & Social Sciences\nPrice: " + COST_ASS;
-		}else if(Gdx.input.isKeyPressed(Input.Keys.NUM_7)){
-			buildingSelector = 8;
-			buildingSelectorSprite = t_res;
-			info = "Residence\nPrice: " + COST_RES;
-		}else if(Gdx.input.isKeyPressed(Input.Keys.NUM_8)){
-			buildingSelector = -1;
-			buildingSelectorSprite = null;
-			info = "Press and hold a number key to build.";
-		}else if(Gdx.input.isKeyPressed(Input.Keys.NUM_9)){
-			buildingSelector = -1;
-			buildingSelectorSprite = null;
-			info = "Press and hold a number key to build.";
-		}else if(Gdx.input.isKeyPressed(Input.Keys.NUM_0)){
-			buildingSelector = -1;
-			buildingSelectorSprite = null;
-			info = "Press and hold a number key to build.";
-		}else{
-			buildingSelector = -1;
-			buildingSelectorSprite = null;
-			info = "Press and hold a number key to build.";
-		}
-
-		selectorFonts.clear();
-		selectorFonts.add(new TextDisplay(info, 226, 105, 160, 1, Color.BLACK));
-		
-		if(Gdx.input.justTouched()) 
-			if(buildingSelector != -1)
-				handleClick(Gdx.input.getX(), Gdx.input.getY());
 	}
 }
