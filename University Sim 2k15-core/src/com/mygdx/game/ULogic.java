@@ -38,10 +38,9 @@ public class ULogic {
 	//Sprite lists
 	List<Building> buildings;
 	List<TextDisplay> statsFonts;
-	List<TextDisplay> twitFonts;
 	List<TextDisplay> selectorFonts;
 	
-	Menu menu = new Menu();
+	Twit twit;
 	
 	//Money
 	int money, students, capacity, tuition, happiness, targetStudents, upkeep;
@@ -49,7 +48,6 @@ public class ULogic {
 	final int COST_ADMIN = 200000, COST_COMPSCI = 100000, COST_GENSCI = 75000, COST_ENGINEERING = 75000, COST_MATH = 75000, COST_ASS = 75000, COST_RES = 500000;
 	
 	//twit message vars
-	String twitMessage;
 	int rand_twit = 0, randit_twit = 0; //random twits vars
 	
 	//building selector view vars
@@ -110,13 +108,14 @@ public class ULogic {
 		date = new Date();
 		ft = new SimpleDateFormat ("MMMM d',' yyyy");
 		
+		
 		loadData();
 		
 		/*for(int i = 0; i < 41; i++){
 			mapIndex.add(0);
 		}*/
 		
-		menu.init();
+		twit = new Twit();
 		
 		//Initialize students,money etc
 		//money = 1000000;
@@ -130,14 +129,9 @@ public class ULogic {
 		buildings = new ArrayList<Building>();
 		//menus = new ArrayList<Menu>();
 		statsFonts = new ArrayList<TextDisplay>();
-		twitFonts = new ArrayList<TextDisplay>();
 		selectorFonts = new ArrayList<TextDisplay>();
 		
 		//add text
-		
-		twitMessage = (menu.getNewTwitMessage(happiness)); //initialize
-		twitFonts.add(new TextDisplay(twitMessage, 15, 170, 180, 1, Color.BLACK));
-		
 		statsFonts.add(new TextDisplay(Integer.toString(money), 975, 715, 150, 2, Color.BLACK)); //statsFonts.get(0) //money
 		statsFonts.add(new TextDisplay("Students: " + Integer.toString(students), 930, 100, 330, 2, Color.BLACK)); //statsFonts.get(1)
 		statsFonts.add(new TextDisplay("Capacity: " + Integer.toString(capacity), 930, 150, 330, 2, Color.BLACK)); //statsFonts.get(2)
@@ -162,7 +156,12 @@ public class ULogic {
 		statsFonts.get(3).text = "Happiness: " + Integer.toString(happiness);
 		statsFonts.get(4).text = "Date: " + ft.format(date);
 		
-		if(randit_twit == rand_twit) addTwitMessage();
+		//new twit message every random amount of time
+		if(randit_twit == rand_twit){
+			twit.addTwitMessage(happiness);
+			randit_twit = 0;
+			rand_twit = ThreadLocalRandom.current().nextInt(30, 150);
+		}
 		randit_twit++;
 		
 		//this pseudorandom stuff makes students approach the target value (see above, based on 
@@ -175,10 +174,9 @@ public class ULogic {
 		if(students > capacity) students = capacity;
 		if(students <= 0) students = 0;
 		
-		
 		handleInput();
 		
-		date.setTime(date.getTime() + (long)(8.64e+7 / 10)); 
+		date.setTime(date.getTime() + (long)(8.64e+7 * DAYS_PER_FRAME)); 
 	}
 	
 	public List<Sprite> getSprites(){
@@ -491,18 +489,5 @@ public class ULogic {
 		if(Gdx.input.justTouched()) 
 			if(buildingSelector != -1)
 				handleClick(Gdx.input.getX(), Gdx.input.getY());
-	}
-	
-	public void addTwitMessage(){
-		twitMessage = (menu.getNewTwitMessage(happiness));
-		for(int i = 0; i < twitFonts.size(); i++){
-			twitFonts.get(i).y-=33;
-		}
-		twitFonts.add(0, new TextDisplay(twitMessage, 15, 170, 180, 1, Color.BLACK));
-		if(twitFonts.size() > 5){
-			twitFonts.remove(5);
-		}
-		randit_twit = 0;
-		rand_twit = ThreadLocalRandom.current().nextInt(30, 150);
 	}
 }

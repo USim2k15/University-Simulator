@@ -63,7 +63,7 @@ public class USim2k15 extends ApplicationAdapter {
 		
 		List<Sprite> sprites = uLogic.getSprites();
 		List<TextDisplay> fonts = new ArrayList<TextDisplay>();
-		fonts.addAll(uLogic.twitFonts);
+		fonts.addAll(uLogic.twit.twitFonts);
 		fonts.addAll(uLogic.statsFonts);
 		fonts.addAll(uLogic.selectorFonts);
 		

@@ -5,6 +5,9 @@
 
 package com.mygdx.game;
 import java.util.concurrent.ThreadLocalRandom;
+
+import com.badlogic.gdx.graphics.Color;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.io.BufferedReader;
@@ -12,22 +15,21 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-public class Menu{
+public class Twit{
 	List<String> positive = new ArrayList<String>(),
 				 vpositive = new ArrayList<String>(),
 				 negative = new ArrayList<String>(),
 				 vnegative = new ArrayList<String>();
 	
-	public Menu(){
-		init();
-	}
+	List<TextDisplay> twitFonts = new ArrayList<TextDisplay>();
+	String twitMessage;
 	
-	void init(){
-		//Initialize the lists of adjectives
+	public Twit(){
 		for(int i = 0;i<4;i++){
 			loadString(i);
 		}
 	}
+	
 	//Load the different happy/mad/sad messages from file into the lists to be later combined with the messages() method call.
 	public void loadString(int flag){
 		
@@ -141,5 +143,16 @@ public class Menu{
 		index = ThreadLocalRandom.current().nextInt(0,templates.length);
 		String template = templates[index];
 		return template;
+	}
+	
+	public void addTwitMessage(int happiness){
+		twitMessage = (getNewTwitMessage(happiness));
+		for(int i = 0; i < twitFonts.size(); i++){
+			twitFonts.get(i).y-=33;
+		}
+		twitFonts.add(0, new TextDisplay(twitMessage, 15, 170, 180, 1, Color.BLACK));
+		if(twitFonts.size() > 5){
+			twitFonts.remove(5);
+		}
 	}
 }
