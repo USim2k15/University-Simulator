@@ -126,7 +126,7 @@ public class ULogic {
 		students = 0;
 		capacity = 0;
 		tuition = 100; //= kb.nextInt();
-		happiness = 100;
+		happiness = 50;
 		
 		
 		//initialize lists
