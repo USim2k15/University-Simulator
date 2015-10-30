@@ -1,5 +1,6 @@
 package com.mygdx.game;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.Gdx;
@@ -9,6 +10,8 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.Date;
+import java.text.SimpleDateFormat;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -20,6 +23,10 @@ public class ULogic {
 	//saved file data
 	File f_map;
 	
+	Date date;
+	SimpleDateFormat ft;
+	
+	final double DAYS_PER_FRAME = 0.1;
 	
 	//background(s)
 	Texture t_bg;
@@ -40,9 +47,9 @@ public class ULogic {
 	Menu menu = new Menu();
 	
 	//Money
-	int money,students,capacity,tuition,happiness, targetStudents, upkeep;
+	int money, students, capacity, tuition, happiness, targetStudents, upkeep;
 	//in-game cost constants
-	int COST_ADMIN = 200000, COST_COMPSCI = 100000, COST_GENSCI = 75000, COST_ENGINEERING = 75000, COST_MATH = 75000, COST_ASS = 75000, COST_RES = 500000;
+	final int COST_ADMIN = 200000, COST_COMPSCI = 100000, COST_GENSCI = 75000, COST_ENGINEERING = 75000, COST_MATH = 75000, COST_ASS = 75000, COST_RES = 500000;
 	
 	//twit message vars
 	String twitMessage;
@@ -103,6 +110,9 @@ public class ULogic {
 		
 		mapIndex = new ArrayList<Integer>();
 		
+		date = new Date();
+		ft = new SimpleDateFormat ("MMMM d',' yyyy");
+		
 		loadData();
 		
 		/*for(int i = 0; i < 41; i++){
@@ -116,7 +126,7 @@ public class ULogic {
 		students = 0;
 		capacity = 0;
 		tuition = 100; //= kb.nextInt();
-		happiness = 50;
+		happiness = 100;
 		
 		
 		//initialize lists
@@ -127,14 +137,15 @@ public class ULogic {
 		selectorFonts = new ArrayList<TextDisplay>();
 		
 		//add text
-		statsFonts.add(new TextDisplay(Integer.toString(money), 975, 715, 180, 2)); //fonts.get(0)
 		
 		twitMessage = (menu.getNewTwitMessage(happiness)); //initialize
-		twitFonts.add(new TextDisplay(twitMessage, 15, 170, 180, 1));
+		twitFonts.add(new TextDisplay(twitMessage, 15, 170, 180, 1, Color.BLACK));
 		
-		statsFonts.add(new TextDisplay("Students: " + Integer.toString(students), 930, 100, 330, 2)); //statsFonts.get(1)
-		statsFonts.add(new TextDisplay("Capacity: " + Integer.toString(capacity), 930, 150, 330, 2)); //statsFonts.get(2)
-		statsFonts.add(new TextDisplay("Happiness: " + Integer.toString(happiness), 930, 50, 330, 2)); //statsFonts.get(3)
+		statsFonts.add(new TextDisplay(Integer.toString(money), 975, 715, 180, 2, Color.BLACK)); //statsFonts.get(0) //money
+		statsFonts.add(new TextDisplay("Students: " + Integer.toString(students), 930, 100, 330, 2, Color.BLACK)); //statsFonts.get(1)
+		statsFonts.add(new TextDisplay("Capacity: " + Integer.toString(capacity), 930, 150, 330, 2, Color.BLACK)); //statsFonts.get(2)
+		statsFonts.add(new TextDisplay("Happiness: " + Integer.toString(happiness), 930, 50, 330, 2, Color.BLACK)); //statsFonts.get(3)
+		statsFonts.add(new TextDisplay("Date: " + ft.format(date), 5, 715, 330, 2, Color.WHITE)); //statsFonts.get(4)
 		
 	}
 	
@@ -143,13 +154,14 @@ public class ULogic {
 		targetStudents = capacity*(50+happiness)/150;
 		if(targetStudents < 0) targetStudents = 0;
 		
-		money+=tuition*students/3650;
-		money-= upkeep *0.01; //can multiple if crazy
+		money += (tuition*students) / (365/DAYS_PER_FRAME);
+		money -= upkeep *0.01; //can multiple if crazy
 		//money+=500;
 		statsFonts.get(0).text = Integer.toString(money);
 		statsFonts.get(1).text = "Students: " + Integer.toString(students);
 		statsFonts.get(2).text = "Capacity: " + Integer.toString(capacity);
 		statsFonts.get(3).text = "Happiness: " + Integer.toString(happiness);
+		statsFonts.get(4).text = "Date: " + ft.format(date);
 		
 		if(randit_twit == rand_twit) addTwitMessage();
 		randit_twit++;
@@ -168,6 +180,8 @@ public class ULogic {
 		handleInput();
 		
 		compileMap();
+		
+		date.setTime(date.getTime() + (long)(8.64e+7 / 10)); 
 	}
 	
 	public List<Sprite> getSprites(){
@@ -357,6 +371,10 @@ public class ULogic {
 		
 		//game data
 		
+		//if date can be retrieved from file
+		///set date to file
+		//(no else because it's already initialized to current time)
+		
 	}
 	
 	public void handleInput(){
@@ -422,7 +440,7 @@ public class ULogic {
 		}
 
 		selectorFonts.clear();
-		selectorFonts.add(new TextDisplay(info, 226, 105, 160, 1));
+		selectorFonts.add(new TextDisplay(info, 226, 105, 160, 1, Color.BLACK));
 		
 		if(Gdx.input.justTouched()) 
 			if(buildingSelector != -1)
@@ -434,7 +452,7 @@ public class ULogic {
 		for(int i = 0; i < twitFonts.size(); i++){
 			twitFonts.get(i).y-=33;
 		}
-		twitFonts.add(0, new TextDisplay(twitMessage, 15, 170, 180, 1));
+		twitFonts.add(0, new TextDisplay(twitMessage, 15, 170, 180, 1, Color.BLACK));
 		if(twitFonts.size() > 5){
 			twitFonts.remove(5);
 		}

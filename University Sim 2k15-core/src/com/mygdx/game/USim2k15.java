@@ -35,7 +35,7 @@ public class USim2k15 extends ApplicationAdapter {
 	@Override
 	public void create () {
 		
-		splashTimer = TimeUtils.millis() + 2000;
+		splashTimer = TimeUtils.millis() + 0;
 		splash = new Texture("splash.jpg");
 		
 		uLogic = new ULogic();
@@ -43,7 +43,6 @@ public class USim2k15 extends ApplicationAdapter {
 		batch = new SpriteBatch();
 		
 		font = new BitmapFont();
-		font.setColor(Color.BLACK);
 	}
 
 	@Override
@@ -78,6 +77,7 @@ public class USim2k15 extends ApplicationAdapter {
 		for(int i = 0; i < fonts.size(); i++){
 			TextDisplay current = fonts.get(i);
 			font.getData().setScale(current.scale, current.scale);
+			font.setColor(current.color);
 			font.draw(batch, current.text, current.x, current.y, current.tWidth, 1, true);
 		}
 		batch.end();
