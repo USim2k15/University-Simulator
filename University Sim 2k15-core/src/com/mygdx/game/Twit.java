@@ -11,7 +11,6 @@ import com.badlogic.gdx.graphics.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -48,7 +47,6 @@ public class Twit{
 					vnegative.add(f.nextLine());
 				}*/
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}finally{
 				try{
@@ -67,7 +65,6 @@ public class Twit{
 					negative.add(sCurrentLine);
 				}
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}finally{
 				try{
@@ -86,7 +83,6 @@ public class Twit{
 					positive.add(sCurrentLine);
 				}
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}finally{
 				try{
@@ -105,7 +101,6 @@ public class Twit{
 					vpositive.add(sCurrentLine);
 				}
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}finally{
 				try{
