@@ -141,11 +141,11 @@ public class ULogic {
 		twitMessage = (menu.getNewTwitMessage(happiness)); //initialize
 		twitFonts.add(new TextDisplay(twitMessage, 15, 170, 180, 1, Color.BLACK));
 		
-		statsFonts.add(new TextDisplay(Integer.toString(money), 975, 715, 180, 2, Color.BLACK)); //statsFonts.get(0) //money
+		statsFonts.add(new TextDisplay(Integer.toString(money), 975, 715, 150, 2, Color.BLACK)); //statsFonts.get(0) //money
 		statsFonts.add(new TextDisplay("Students: " + Integer.toString(students), 930, 100, 330, 2, Color.BLACK)); //statsFonts.get(1)
 		statsFonts.add(new TextDisplay("Capacity: " + Integer.toString(capacity), 930, 150, 330, 2, Color.BLACK)); //statsFonts.get(2)
 		statsFonts.add(new TextDisplay("Happiness: " + Integer.toString(happiness), 930, 50, 330, 2, Color.BLACK)); //statsFonts.get(3)
-		statsFonts.add(new TextDisplay("Date: " + ft.format(date), 5, 715, 330, 2, Color.WHITE)); //statsFonts.get(4)
+		statsFonts.add(new TextDisplay("Date: " + ft.format(date), 5, 715, 330, 1.5f, Color.WHITE)); //statsFonts.get(4)
 		
 	}
 	
