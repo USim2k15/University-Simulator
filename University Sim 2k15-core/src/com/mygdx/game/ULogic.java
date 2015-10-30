@@ -122,8 +122,8 @@ public class ULogic {
 		menu.init();
 		
 		//Initialize students,money etc
-		money = 1000000;
-		students = 0;
+		//money = 1000000;
+		//students = 0;
 		capacity = 0;
 		tuition = 100; //= kb.nextInt();
 		happiness = 50;
@@ -145,11 +145,13 @@ public class ULogic {
 		statsFonts.add(new TextDisplay("Students: " + Integer.toString(students), 930, 100, 330, 2, Color.BLACK)); //statsFonts.get(1)
 		statsFonts.add(new TextDisplay("Capacity: " + Integer.toString(capacity), 930, 150, 330, 2, Color.BLACK)); //statsFonts.get(2)
 		statsFonts.add(new TextDisplay("Happiness: " + Integer.toString(happiness), 930, 50, 330, 2, Color.BLACK)); //statsFonts.get(3)
-		statsFonts.add(new TextDisplay("Date: " + ft.format(date), 5, 715, 330, 1.5f, Color.WHITE)); //statsFonts.get(4)
+		statsFonts.add(new TextDisplay("Date: " + ft.format(date), 5, 710, 330, 1.5f, Color.WHITE)); //statsFonts.get(4)
 		
 	}
 	
 	public void loop(){ //called in USim2k15.render()
+		
+		compileMap();
 		
 		targetStudents = capacity*(50+happiness)/150;
 		if(targetStudents < 0) targetStudents = 0;
@@ -178,8 +180,6 @@ public class ULogic {
 		
 		
 		handleInput();
-		
-		compileMap();
 		
 		date.setTime(date.getTime() + (long)(8.64e+7 / 10)); 
 	}
@@ -334,7 +334,30 @@ public class ULogic {
 		}
 		
 		//game data
-		
+		try{
+			f_map = new File("C:/USim2k15/save.udat");
+			
+			if(!f_map.exists()){
+				File directory = new File(f_map.getParentFile().getAbsolutePath());
+				directory.mkdirs();
+				
+				f_map.createNewFile();
+			}
+			
+			FileWriter fw = new FileWriter(f_map.getAbsoluteFile());
+			BufferedWriter bw = new BufferedWriter(fw);
+			
+			for(int i = 0; i < mapIndex.size(); i++){
+				bw.write(money + " ");
+				bw.write(students + " ");
+				bw.write(date.getTime() + " ");
+				bw.write(upkeep + " ");
+			}
+			
+			bw.close();
+		}catch(IOException e){
+			e.printStackTrace();
+		}
 	}
 	
 	public void loadData(){
@@ -375,6 +398,38 @@ public class ULogic {
 		///set date to file
 		//(no else because it's already initialized to current time)
 		
+		try{
+			f_map = new File("C:/USim2k15/save.udat");
+			
+			if(!f_map.exists()){
+				File directory = new File(f_map.getParentFile().getAbsolutePath());
+				directory.mkdirs();
+				
+				f_map.createNewFile();
+				
+				FileWriter fw = new FileWriter(f_map.getAbsoluteFile());
+				BufferedWriter bw = new BufferedWriter(fw);
+				
+				bw.write(1000000 + " " + 0 + " " + 0 + " " + 0);
+				
+				bw.close();
+			}
+			
+			Scanner in = new Scanner(f_map);
+			
+			if(in.hasNextInt()){
+				money = in.nextInt();
+				students = in.nextInt();
+				long d = in.nextLong();
+				if(d != 0) date.setTime(d);
+				upkeep = in.nextInt();
+			}
+			
+			in.close();
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+		
 	}
 	
 	public void handleInput(){
@@ -388,6 +443,16 @@ public class ULogic {
 		
 		if(Gdx.input.isKeyJustPressed(Input.Keys.S)){
 			saveData();
+		}
+		
+		if(Gdx.input.isKeyJustPressed(Input.Keys.R)){
+			money = 1000000;
+			upkeep = 0;
+			students = 0;
+			date = new Date();
+			for(int i = 0; i < 40; i++){
+				mapIndex.set(i, 0);
+			}
 		}
 		
 		//building selector (can be done better)
