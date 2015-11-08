@@ -9,6 +9,7 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -30,10 +31,12 @@ public class USim2k15 extends ApplicationAdapter {
 	
 	Texture splash;
 	
+	final int SPLASH_TIME = 0;
+	
 	@Override
 	public void create () {
 		
-		splashTimer = TimeUtils.millis() + 0;
+		splashTimer = TimeUtils.millis() + SPLASH_TIME;
 		splash = new Texture("splash.jpg");
 		
 		uLogic = new ULogic();
@@ -50,6 +53,8 @@ public class USim2k15 extends ApplicationAdapter {
 			
 			batch.begin();
 			
+			batch.setColor(1.0f, 1.0f, 1.0f, (TimeUtils.millis() - splashTimer) / (float)SPLASH_TIME);
+			
 			batch.draw(splash, 0, 0);
 			
 			batch.end();
@@ -57,12 +62,14 @@ public class USim2k15 extends ApplicationAdapter {
 			return;
 		}
 		
+		batch.setColor(Color.WHITE);
+		
 		uLogic.loop();
 		
 		List<Sprite> sprites = uLogic.getSprites();
 		List<TextDisplay> fonts = uLogic.getFonts();
 		
-		Gdx.gl.glClearColor(1, 0, 0, 1);
+		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
 		batch.begin();

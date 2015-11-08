@@ -35,10 +35,11 @@ public class ULogic {
 	Texture t_admin1, t_admin2, t_compSci, t_genSci, t_engineering, t_math, t_ass, t_res, t_test1;
 	Texture t_adminfull; //only used by building selector
 	//UI
-	Texture t_stats, t_quit;
+	Texture t_stats, t_quit, t_slider;
 	
 	//Sprite lists
 	List<Building> buildings;
+	List<Slider> sliders;
 	List<TextDisplay> statsFonts;
 	List<TextDisplay> selectorFonts;
 	
@@ -46,6 +47,7 @@ public class ULogic {
 	
 	//Money
 	int money, students, capacity, tuition, happiness, targetStudents, upkeep;
+	final double TUITION_MAX = 20000.0;
 	//in-game cost constants
 	final int COST_ADMIN = 200000, 
 			  COST_COMPSCI = 100000, 
@@ -82,7 +84,6 @@ public class ULogic {
 	int testVar = 0;
 	
 	public ULogic(){ //constructor called in USim2k15::create()
-		loadImages();
 		init();
 	}
 	
@@ -104,11 +105,13 @@ public class ULogic {
 		t_adminfull = new Texture("admin.png");
 		
 		//UI
+		t_slider = new Texture("slider.png");
 		//t_stats = new Texture("stats.png");
 		//t_quit = new Texture("quit.png");
 	}
 	
 	public void init(){
+		loadImages();
 		
 		upkeep = 0;
 		
@@ -130,15 +133,16 @@ public class ULogic {
 		//money = 1000000;
 		//students = 0;
 		capacity = 0;
-		tuition = 100; //= kb.nextInt();
+		tuition = 0; //TODO load from file
 		happiness = 100;
 		
 		
 		//initialize lists
 		buildings = new ArrayList<Building>();
-		//menus = new ArrayList<Menu>();
+		sliders = new ArrayList<Slider>();
 		statsFonts = new ArrayList<TextDisplay>();
 		selectorFonts = new ArrayList<TextDisplay>();
+		
 		
 		//add text
 		statsFonts.add(new TextDisplay(Integer.toString(money), 975, 715, 0, 2, Color.BLACK, -1)); //statsFonts.get(0) //money
@@ -146,7 +150,11 @@ public class ULogic {
 		statsFonts.add(new TextDisplay("Capacity: " + Integer.toString(capacity), 930, 150, 330, 2, Color.BLACK, 1)); //statsFonts.get(2)
 		statsFonts.add(new TextDisplay("Happiness: " + Integer.toString(happiness), 930, 50, 330, 2, Color.BLACK, 1)); //statsFonts.get(3)
 		statsFonts.add(new TextDisplay("Date: " + ft.format(date), 10, 710, 330, 1.5f, Color.WHITE, -1)); //statsFonts.get(4)
+		statsFonts.add(new TextDisplay("$ " + tuition, 540, 715, 0, 2, Color.WHITE, -1)); //statsFonts.get(5)
 		
+		statsFonts.add(new TextDisplay("Tuition: ", 400, 715, 0, 2, Color.WHITE, 0)); //eventually should be in some kind of menu fonts
+		sliders.add(new Slider(t_slider, 400, 687, 100));
+		sliders.get(0).setPos( (int)((tuition / TUITION_MAX) * 100) );
 	}
 	
 	public void loop(){ //called in USim2k15::render()
@@ -155,6 +163,8 @@ public class ULogic {
 		
 		targetStudents = capacity*(50+happiness)/150;
 		if(targetStudents < 0) targetStudents = 0;
+		
+		tuition = (int)( (sliders.get(0).getPos() / 100.0) * TUITION_MAX);
 		
 		money += (tuition*students) / (365/DAYS_PER_FRAME);
 		money -= upkeep *0.01; //can multiple if crazy
@@ -167,6 +177,7 @@ public class ULogic {
 		statsFonts.get(2).text = "Capacity: " + Integer.toString(capacity);
 		statsFonts.get(3).text = "Happiness: " + Integer.toString(happiness);
 		statsFonts.get(4).text = "Date: " + ft.format(date);
+		statsFonts.get(5).text = "$ " + tuition;
 		
 		//new twit message every random amount of time
 		if(randit_twit == rand_twit){
@@ -196,6 +207,7 @@ public class ULogic {
 		sprites.add(new Sprite(t_bg,0,0));
 		sprites.add(new Sprite(t_overlay,0,0));
 		sprites.addAll(buildings);
+		sprites.addAll(sliders);
 		//sprites.addAll(menus);
 		
 		if(buildingSelector == 1)
@@ -352,16 +364,27 @@ public class ULogic {
 		selectorFonts.add(new TextDisplay(info, 226, 105, 160, 1, Color.BLACK, 1));
 		
 		if(Gdx.input.justTouched()) 
-			if(buildingSelector != -1)
-				handleClick(Gdx.input.getX(), Gdx.input.getY());
-			//else{ }
-				//deal with normal click
+			handleClick(Gdx.input.getX(), Gdx.input.getY());
+		
+		
+		if(Gdx.input.isButtonPressed(Input.Buttons.LEFT)){
+			int mx = Gdx.input.getX();
+			int my = Gdx.input.getY();
+			//check and handle sliders
+			for(int i = 0; i < sliders.size(); i++){
+				int curx = sliders.get(i).getX();
+				int cury = 720 - sliders.get(i).getY(); //flip y to compare to mouse
+				if(my >= cury-30 && my < cury && mx > curx && mx < curx + 30){
+					sliders.get(i).slide(mx);
+				}
+			}
+		}
 	}
 	
-	public void handleClick(int clickx, int clicky){ //called from handleInput()
+	public void handleClick(int clickx, int clicky){ //called from handleInput() //coordinates are topleft index!
 
 		
-		if((clicky >= 214 && clicky < 278) || (clicky >= 424 && clicky < 488)){
+		if( ((clicky >= 214 && clicky < 278) || (clicky >= 424 && clicky < 488)) && buildingSelector != -1 ){ //clicked somehwere on a plot
 			int itx = 0, ity = 214;
 			for(int i = 0; i < 40; i++){
 				
@@ -410,6 +433,10 @@ public class ULogic {
 				}
 				itx+=64;
 			}
+		}
+		
+		else if(clicky < 200){ //clicked in menu area
+			
 		}
 	}
 	

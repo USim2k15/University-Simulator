@@ -12,8 +12,8 @@ public class Sprite {
 		y = iy;
 	}
 	
+	//getters
 	public Texture getTexture(){ return img;}//Used by USim2k15
-	
 	public int getX(){ return x;}
 	public int getY(){ return y;}
 }
