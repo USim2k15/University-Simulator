@@ -285,7 +285,7 @@ public class ULogic {
 	public void handleInput(){
 		//dev tools
 		if(Gdx.input.isKeyPressed(Input.Keys.NUMPAD_8)){
-			money+=100000;
+			money+=1000000000;
 		}
 		
 		
