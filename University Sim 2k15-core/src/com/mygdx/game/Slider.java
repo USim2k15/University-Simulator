@@ -13,14 +13,14 @@ public class Slider extends Sprite{
 		width = w;
 	}
 	
-	public void setPos(int p){ //p is an integer 1 - 100
-		if(p < 1) x = begin;
-		x = begin + (width - begin)*p/100;
+	public void setPos(double p){ //p is a decimal 0 - 1
+		if(p == 0) x = begin;
+		else x = (int)(begin + width*p);
 	}
 	
-	public int getPos(){ 
-		//DIFFERENT THAN inherited getX(). This returns a value 0 - 100.
-		return (int) (((x - begin) / (double)width) *100);
+	public double getPos(){ 
+		//DIFFERENT THAN inherited getX(). This returns a decimal value 0 - 1.
+		return ((x - begin) / (double)width);
 	}
 	
 	public void slide(int mousex){

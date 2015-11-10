@@ -16,8 +16,15 @@ import java.text.NumberFormat;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
 
 public class ULogic {
 	
@@ -47,15 +54,9 @@ public class ULogic {
 	
 	//Money
 	int money, students, capacity, tuition, happiness, targetStudents, upkeep;
-	final double TUITION_MAX = 20000.0;
-	//in-game cost constants
-	final int COST_ADMIN = 200000, 
-			  COST_COMPSCI = 100000, 
-			  COST_GENSCI = 75000, 
-			  COST_ENGINEERING = 75000, 
-			  COST_MATH = 75000, 
-			  COST_ASS = 75000, 
-			  COST_RES = 500000;
+	
+	double TUITION_MAX;
+	int COST_ADMIN, COST_COMPSCI, COST_GENSCI, COST_ENGINEERING, COST_MATH, COST_ASS, COST_RES;
 	
 	//random twits vars
 	int rand_twit = 0, randit_twit = 0;
@@ -113,29 +114,14 @@ public class ULogic {
 	public void init(){
 		loadImages();
 		
-		upkeep = 0;
-		
 		mapIndex = new ArrayList<Integer>();
 		
 		date = new Date();
 		ft = new SimpleDateFormat ("MMMM d',' yyyy");
 		
-		
 		loadData();
 		
-		/*for(int i = 0; i < 41; i++){
-			mapIndex.add(0);
-		}*/
-		
 		twit = new Twit();
-		
-		//Initialize students,money etc
-		//money = 1000000;
-		//students = 0;
-		capacity = 0;
-		tuition = 0; //TODO load from file
-		happiness = 100;
-		
 		
 		//initialize lists
 		buildings = new ArrayList<Building>();
@@ -149,12 +135,12 @@ public class ULogic {
 		statsFonts.add(new TextDisplay("Students: " + Integer.toString(students), 930, 100, 330, 2, Color.BLACK, 1)); //statsFonts.get(1)
 		statsFonts.add(new TextDisplay("Capacity: " + Integer.toString(capacity), 930, 150, 330, 2, Color.BLACK, 1)); //statsFonts.get(2)
 		statsFonts.add(new TextDisplay("Happiness: " + Integer.toString(happiness), 930, 50, 330, 2, Color.BLACK, 1)); //statsFonts.get(3)
-		statsFonts.add(new TextDisplay("Date: " + ft.format(date), 10, 710, 330, 1.5f, Color.WHITE, -1)); //statsFonts.get(4)
+		statsFonts.add(new TextDisplay(ft.format(date), 10, 710, 330, 1.5f, Color.WHITE, -1)); //statsFonts.get(4)
 		statsFonts.add(new TextDisplay("$ " + tuition, 540, 715, 0, 2, Color.WHITE, -1)); //statsFonts.get(5)
 		
 		statsFonts.add(new TextDisplay("Tuition: ", 400, 715, 0, 2, Color.WHITE, 0)); //eventually should be in some kind of menu fonts
 		sliders.add(new Slider(t_slider, 400, 687, 100));
-		sliders.get(0).setPos( (int)((tuition / TUITION_MAX) * 100) );
+		sliders.get(0).setPos(tuition / TUITION_MAX);
 	}
 	
 	public void loop(){ //called in USim2k15::render()
@@ -164,10 +150,10 @@ public class ULogic {
 		targetStudents = capacity*(50+happiness)/150;
 		if(targetStudents < 0) targetStudents = 0;
 		
-		tuition = (int)( (sliders.get(0).getPos() / 100.0) * TUITION_MAX);
+		tuition = (int)( (sliders.get(0).getPos()) * TUITION_MAX);
 		
 		money += (tuition*students) / (365/DAYS_PER_FRAME);
-		money -= upkeep *0.01; //can multiple if crazy
+		money -= upkeep; //can multiple if crazy
 		
 		NumberFormat nf = NumberFormat.getInstance();
 		nf.setGroupingUsed(true);
@@ -176,7 +162,7 @@ public class ULogic {
 		statsFonts.get(1).text = "Students: " + Integer.toString(students);
 		statsFonts.get(2).text = "Capacity: " + Integer.toString(capacity);
 		statsFonts.get(3).text = "Happiness: " + Integer.toString(happiness);
-		statsFonts.get(4).text = "Date: " + ft.format(date);
+		statsFonts.get(4).text = ft.format(date);
 		statsFonts.get(5).text = "$ " + tuition;
 		
 		//new twit message every random amount of time
@@ -312,7 +298,6 @@ public class ULogic {
 		}
 		
 		//building selector (can be done better)
-		//what the fuck?
 		String info;
 		if(Gdx.input.isKeyPressed(Input.Keys.NUM_1)){
 			buildingSelector = 1;
@@ -403,7 +388,7 @@ public class ULogic {
 								mapIndex.set(i+1, 2);
 								
 								money -= COST_ADMIN; //admin cost 200k
-								upkeep += 20;
+								upkeep += 50;
 							}
 						}
 						else {
@@ -411,17 +396,17 @@ public class ULogic {
 							//take off proper cost
 							if(buildingSelector == 3 && money >= COST_COMPSCI){ //computer science
 								money -= COST_COMPSCI;
-								upkeep += 150;
+								upkeep += 300;
 								mapIndex.set(i, buildingSelector);
 							}
 							else if(buildingSelector >= 4 && buildingSelector <= 7 && money >= COST_GENSCI){ //4-7
 								money -= COST_GENSCI;
-								upkeep += 100;
+								upkeep += 200;
 								mapIndex.set(i, buildingSelector);
 							}
 							else if(buildingSelector == 8 && money >= COST_RES){ //res
 								money -= COST_RES; //student residences are fuckin EXPENSIVE
-								upkeep += 250;
+								upkeep += 500;
 								mapIndex.set(i, buildingSelector);
 							}
 						}
@@ -484,6 +469,8 @@ public class ULogic {
 			bw.write(students + " ");
 			bw.write(date.getTime() + " ");
 			bw.write(upkeep + " ");
+			bw.write(tuition + " ");
+			bw.write(happiness + " ");
 			
 			bw.close();
 		}catch(IOException e){
@@ -541,10 +528,42 @@ public class ULogic {
 				if(d != 0) date.setTime(d);
 			} //no else because date is set by default when object is created				
 			if(in.hasNextInt()) upkeep = in.nextInt(); else upkeep = 0;
+			if(in.hasNextInt()) tuition = in.nextInt(); else tuition = 10000;
+			if(in.hasNextInt()) happiness = in.nextInt(); else happiness = 100;
 			
 			in.close();
 		}catch(IOException e){
 			e.printStackTrace();
 		}
+		
+		getData();
+	}
+	
+	public void getData(){
+		//Creating a SocketClient object
+		//IP 142.177.105.129
+		//LAN 192.168.2.13
+    	ServerData client = new ServerData ("142.177.105.129", 1615);
+        try {
+            //trying to establish connection to the server
+            client.connect();
+            //waiting to read response from server
+            String response = client.readResponse();
+            String[] values = response.split(" ");
+            
+            TUITION_MAX = Double.parseDouble(values[0]);
+        	COST_ADMIN = Integer.parseInt(values[1]); 
+        	COST_COMPSCI = Integer.parseInt(values[2]);  
+        	COST_GENSCI = Integer.parseInt(values[3]);  
+        	COST_ENGINEERING = Integer.parseInt(values[4]);  
+        	COST_MATH = Integer.parseInt(values[5]);  
+        	COST_ASS = Integer.parseInt(values[6]);  
+        	COST_RES = Integer.parseInt(values[7]); 
+            
+        } catch (UnknownHostException e) {
+            System.err.println("Host unknown. Cannot establish connection");
+        } catch (IOException e) {
+            System.err.println("Cannot establish connection. Server may not be up."+e.getMessage());
+        }
 	}
 }
