@@ -540,14 +540,20 @@ public class ULogic {
 			e.printStackTrace();
 		}
 		
-		getData();
+		getData(false);
 	}
 	
-	public void getData(){
+	public void getData(boolean local){
 		//Creating a SocketClient object
 		//IP 142.177.105.129
 		//LAN 192.168.2.13
-    	ServerData client = new ServerData ("192.168.2.13", 1615);
+		ServerData client;
+		
+		if(local)
+			client = new ServerData ("192.168.2.13", 1615);
+		else
+			client = new ServerData ("142.177.105.129", 1615);
+
         try {
             //trying to establish connection to the server
             client.connect();
@@ -567,7 +573,8 @@ public class ULogic {
         } catch (UnknownHostException e) {
             System.err.println("Host unknown. Cannot establish connection");
         } catch (IOException e) {
-            System.err.println("Cannot establish connection. Server may not be up."+e.getMessage());
+            System.err.println("Cannot establish connection. Server may not be up. "+e.getMessage());
+            getData(true);
         }
 	}
 }
