@@ -90,23 +90,23 @@ public class ULogic {
 	
 	private void loadImages(){
 		//background(s)
-		t_bg = new Texture("background.png");
-		t_overlay = new Texture("overlay.png");
+		t_bg = new Texture(Gdx.files.internal("data/background.png"));
+		t_overlay = new Texture(Gdx.files.internal("data/overlay.png"));
 		
 		//buildings
-		t_admin1 = new Texture("admin1.png"); //1
-		t_admin2 = new Texture("admin2.png"); //2
-		t_compSci = new Texture("compsci.png"); //3
-		t_genSci = new Texture("gen_science.png"); //4
-		t_engineering = new Texture("engineering.png"); //5
-		t_math = new Texture("math.png"); //6
-		t_ass = new Texture("a&ss.png"); //7
-		t_res = new Texture("res.png"); //8
+		t_admin1 = new Texture(Gdx.files.internal("data/admin1.png")); //1
+		t_admin2 = new Texture(Gdx.files.internal("data/admin2.png")); //2
+		t_compSci = new Texture(Gdx.files.internal("data/compsci.png")); //3
+		t_genSci = new Texture(Gdx.files.internal("data/gen_science.png")); //4
+		t_engineering = new Texture(Gdx.files.internal("data/engineering.png")); //5
+		t_math = new Texture(Gdx.files.internal("data/math.png")); //6
+		t_ass = new Texture(Gdx.files.internal("data/a&ss.png")); //7
+		t_res = new Texture(Gdx.files.internal("data/res.png")); //8
 		
-		t_adminfull = new Texture("admin.png");
+		t_adminfull = new Texture(Gdx.files.internal("data/admin.png"));
 		
 		//UI
-		t_slider = new Texture("slider.png");
+		t_slider = new Texture(Gdx.files.internal("data/slider.png"));
 		//t_stats = new Texture("stats.png");
 		//t_quit = new Texture("quit.png");
 	}
@@ -216,6 +216,7 @@ public class ULogic {
 	public void compileMap(){ //called each loop
 		if(!(oldMapIndex.equals(mapIndex))){ //only does its thing if the map is different
 			capacity = 0;
+			upkeep = 0;
 			
 			buildings.clear();
 			
@@ -231,31 +232,38 @@ public class ULogic {
 					itx+=64;
 				}else if(mapIndex.get(i) == 1){
 					buildings.add(new Building(t_admin1,itx,ity));
+					upkeep += 50;
 					itx+=64;
 				}else if(mapIndex.get(i) == 2){
 					buildings.add(new Building(t_admin2, itx, ity));
 					itx+=64;
 				}else if(mapIndex.get(i) == 3){
+					upkeep += 300;
 					capacity+=300;
 					buildings.add(new Building(t_compSci, itx, ity));
 					itx+=64;
 				}else if(mapIndex.get(i) == 4){
+					upkeep += 200;
 					capacity+=200;
 					buildings.add(new Building(t_genSci, itx, ity));
 					itx+=64;
 				}else if(mapIndex.get(i) == 5){
+					upkeep += 200;
 					capacity+=200;
 					buildings.add(new Building(t_engineering, itx, ity));
 					itx+=64;
 				}else if(mapIndex.get(i) == 6){
+					upkeep += 200;
 					capacity+=200;
 					buildings.add(new Building(t_math, itx, ity));
 					itx+=64;
 				}else if(mapIndex.get(i) == 7){
+					upkeep += 200;
 					capacity+=400;
 					buildings.add(new Building(t_ass, itx, ity));
 					itx+=64;
 				}else if(mapIndex.get(i) == 8){
+					upkeep += 500;
 					capacity+=750;
 					buildings.add(new Building(t_res, itx, ity));
 					itx+=64;
@@ -381,14 +389,13 @@ public class ULogic {
 				if(clickx >= itx && clickx < itx+64 && clicky >= ity && clicky < ity+64){
 					if(mapIndex.get(i) == 0){
 						if(buildingSelector == 1){
-							if(mapIndex.get(i+1) != 0 || i == 19 || i == 39 || money < COST_ADMIN){ //no room for admin (or not enough $$$)
-								//trying to set admin building but can't
+							if(i == 39 || i == 19 || mapIndex.get(i+1) != 0 || money < COST_ADMIN){ //no room for admin (or not enough $$$)
+								//trying to set admin building but can't (show an error or something maybe)
 							}else{
 								mapIndex.set(i, 1);
 								mapIndex.set(i+1, 2);
 								
 								money -= COST_ADMIN; //admin cost 200k
-								upkeep += 50;
 							}
 						}
 						else {
@@ -396,17 +403,14 @@ public class ULogic {
 							//take off proper cost
 							if(buildingSelector == 3 && money >= COST_COMPSCI){ //computer science
 								money -= COST_COMPSCI;
-								upkeep += 300;
 								mapIndex.set(i, buildingSelector);
 							}
 							else if(buildingSelector >= 4 && buildingSelector <= 7 && money >= COST_GENSCI){ //4-7
 								money -= COST_GENSCI;
-								upkeep += 200;
 								mapIndex.set(i, buildingSelector);
 							}
 							else if(buildingSelector == 8 && money >= COST_RES){ //res
 								money -= COST_RES; //student residences are fuckin EXPENSIVE
-								upkeep += 500;
 								mapIndex.set(i, buildingSelector);
 							}
 						}
@@ -543,7 +547,7 @@ public class ULogic {
 		//Creating a SocketClient object
 		//IP 142.177.105.129
 		//LAN 192.168.2.13
-    	ServerData client = new ServerData ("142.177.105.129", 1615);
+    	ServerData client = new ServerData ("192.168.2.13", 1615);
         try {
             //trying to establish connection to the server
             client.connect();

@@ -6,13 +6,13 @@
 package com.mygdx.game;
 import java.util.concurrent.ThreadLocalRandom;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
 
 public class Twit{
 	List<String> positive = new ArrayList<String>(),
@@ -32,82 +32,41 @@ public class Twit{
 	//Load the different happy/mad/sad messages from file into the lists to be later combined with the messages() method call.
 	public void loadString(int flag){
 		
-		BufferedReader br = null;
-		
 		if(flag == 0){
-			try {
-				br = new BufferedReader(new FileReader("vnegative.txt"));
-				
-				String sCurrentLine;
-				while((sCurrentLine = br.readLine()) != null){
-					vnegative.add(sCurrentLine);
-				}
-				/*f = new Scanner (new File("C:/vnegative.txt"));
-				while(f.hasNextLine()){
-					vnegative.add(f.nextLine());
-				}*/
-			} catch (IOException e) {
-				e.printStackTrace();
-			}finally{
-				try{
-					if(br!=null)br.close();
-				}catch(IOException ex){
-					ex.printStackTrace();
-				}
+			FileHandle file = Gdx.files.internal("data/vnegative.txt");
+			String data = file.readString();
+			String[] tokens = data.split("\n");
+			
+			for(int i = 0; i < tokens.length; i++){
+				vnegative.add(tokens[i]);
 			}
 		}
-		if(flag == 1){
-			try {
-				br = new BufferedReader(new FileReader("negative.txt"));
-				
-				String sCurrentLine;
-				while((sCurrentLine = br.readLine()) != null){
-					negative.add(sCurrentLine);
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}finally{
-				try{
-					if(br!=null)br.close();
-				}catch(IOException ex){
-					ex.printStackTrace();
-				}
+		else if(flag == 1){
+			FileHandle file = Gdx.files.internal("data/negative.txt");
+			String data = file.readString();
+			String[] tokens = data.split("\n");
+			
+			for(int i = 0; i < tokens.length; i++){
+				negative.add(tokens[i]);
 			}
 		}
-		if(flag == 2){
-			try {
-				br = new BufferedReader(new FileReader("positive.txt"));
-				
-				String sCurrentLine;
-				while((sCurrentLine = br.readLine()) != null){
-					positive.add(sCurrentLine);
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}finally{
-				try{
-					if(br!=null)br.close();
-				}catch(IOException ex){
-					ex.printStackTrace();
-				}
+		else if(flag == 2){
+			FileHandle file = Gdx.files.internal("data/positive.txt");
+			String data = file.readString();
+			String[] tokens = data.split("\n");
+			
+			for(int i = 0; i < tokens.length; i++){
+				positive.add(tokens[i]);
 			}
 		}
-		if(flag == 3){
-			try {
-				br = new BufferedReader(new FileReader("vpositive.txt"));
-				
-				String sCurrentLine;
-				while((sCurrentLine = br.readLine()) != null){
-					vpositive.add(sCurrentLine);
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}finally{
-				try{
-					if(br!=null)br.close();
-				}catch(IOException ex){
-					ex.printStackTrace();
-				}
+		else if(flag == 3){
+			
+			FileHandle file = Gdx.files.internal("data/vpositive.txt");
+			String data = file.readString();
+			String[] tokens = data.split("\n");
+			
+			for(int i = 0; i < tokens.length; i++){
+				vpositive.add(tokens[i]);
 			}
 		}
 	}

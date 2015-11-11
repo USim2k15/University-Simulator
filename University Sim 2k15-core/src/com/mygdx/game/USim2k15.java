@@ -37,7 +37,7 @@ public class USim2k15 extends ApplicationAdapter {
 	public void create () {
 		
 		splashTimer = TimeUtils.millis() + SPLASH_TIME;
-		splash = new Texture("splash.jpg");
+		splash = new Texture(Gdx.files.internal("data/splash.jpg"));
 		
 		uLogic = new ULogic();
 		
