@@ -5,6 +5,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
@@ -25,7 +26,8 @@ public class ServerData {
 
     public void connect() throws UnknownHostException, IOException{
         System.out.println("Attempting to connect to "+hostname+":"+port);
-        socketClient = new Socket(hostname,port);
+        socketClient = new Socket();
+        socketClient.connect(new InetSocketAddress(hostname, port), 1000); //time out after 1000ms
         System.out.println("Connection Established");
     }
 

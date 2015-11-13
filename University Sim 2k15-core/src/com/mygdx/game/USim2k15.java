@@ -30,6 +30,7 @@ public class USim2k15 extends ApplicationAdapter {
 	long splashTimer;
 	
 	Texture splash;
+	Texture open;
 	
 	final int SPLASH_TIME = 3000;
 	
@@ -39,12 +40,11 @@ public class USim2k15 extends ApplicationAdapter {
 		long start = TimeUtils.millis();
 		
 		splashTimer = TimeUtils.millis() + SPLASH_TIME;
+		
 		splash = new Texture(Gdx.files.internal("data/splash.jpg"));
 		
 		uLogic = new ULogic();
-		
 		batch = new SpriteBatch();
-		
 		font = new BitmapFont();
 		
 		System.out.println("Startup took " + (TimeUtils.millis() - start) + " milliseconds.");
