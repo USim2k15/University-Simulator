@@ -10,7 +10,7 @@ Downloads
 
 Changelog
 ---------
-**ALPHA v1.x.x**
+**ALPHA v1**
 
 <table>
 <tr>
