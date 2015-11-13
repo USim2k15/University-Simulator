@@ -10,10 +10,20 @@ Downloads
 
 Changelog
 ---------
-**ALPHA**
+**ALPHA v1**
 
-v1.0.0
-* Initial ALPHA release. Game is questionably playable.
+<table>
+<tr>
+  <td> <b>Version</b> </td>
+  <td> <b>Changes</b> </td>
+</tr>
 
-v1.0.1
-* Fixed client-server connection.
+<tr>
+  <td>v1.0.0</td>
+  <td>Initial ALPHA release. Game is questionably playable.</td>
+</tr>
+<tr>
+  <td>v1.0.1</td>
+  <td>Fixed client-server connection.</td>
+</tr>
+</table>
