@@ -12,7 +12,6 @@ import com.badlogic.gdx.graphics.Color;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.io.BufferedReader;
 
 public class Twit{
 	List<String> positive = new ArrayList<String>(),

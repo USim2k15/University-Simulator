@@ -16,14 +16,8 @@ import java.text.NumberFormat;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.InetAddress;
-import java.net.Socket;
 import java.net.UnknownHostException;
 
 public class ULogic {
@@ -509,10 +503,6 @@ public class ULogic {
 		
 		//game data
 		
-		//if date can be retrieved from file
-		///set date to file
-		//(no else because it's already initialized to current time)
-		
 		try{
 			File f_dat = new File("C:/USim2k15/save.udat");
 			
@@ -561,6 +551,7 @@ public class ULogic {
             String response = client.readResponse();
             String[] values = response.split(" ");
             
+            //initialize game values
             TUITION_MAX = Double.parseDouble(values[0]);
         	COST_ADMIN = Integer.parseInt(values[1]); 
         	COST_COMPSCI = Integer.parseInt(values[2]);  
@@ -569,12 +560,64 @@ public class ULogic {
         	COST_MATH = Integer.parseInt(values[5]);  
         	COST_ASS = Integer.parseInt(values[6]);  
         	COST_RES = Integer.parseInt(values[7]); 
+        	
+        	//save values to file in case server goes down later
+        	File f_server = new File("C:/USim2k15/server.udat");
+        	if(!f_server.exists()){
+				File directory = new File(f_server.getParentFile().getAbsolutePath());
+				directory.mkdirs();
+				
+				f_server.createNewFile();
+			}
+        	
+        	FileWriter fw = new FileWriter(f_server.getAbsoluteFile());
+			BufferedWriter bw = new BufferedWriter(fw);
+			
+			bw.write(TUITION_MAX + " ");
+			bw.write(COST_ADMIN + " ");
+			bw.write(COST_COMPSCI + " ");
+			bw.write(COST_GENSCI + " ");
+			bw.write(COST_ENGINEERING + " ");
+			bw.write(COST_MATH + " ");
+			bw.write(COST_ASS + " ");
+			bw.write(COST_RES + " ");
+			
+			bw.close();
             
         } catch (UnknownHostException e) {
             System.err.println("Host unknown. Cannot establish connection");
-        } catch (IOException e) {
+        } catch (IOException e) { //cannot connect
             System.err.println("Cannot establish connection. Server may not be up. "+e.getMessage());
-            getData(true);
+            if(!local) getData(true); //try local connection first
+            else{ //both IP and LAN did not work
+            	//load from file
+            	File f_server = new File("C:/USim2k15/server.udat");
+            	if(f_server.exists()){
+            		try{
+	            		Scanner in = new Scanner(f_server);
+	            		String data = in.nextLine();
+	            		String[] values = data.split(" ");
+	            		
+	            		TUITION_MAX = Double.parseDouble(values[0]);
+	                	COST_ADMIN = Integer.parseInt(values[1]); 
+	                	COST_COMPSCI = Integer.parseInt(values[2]);  
+	                	COST_GENSCI = Integer.parseInt(values[3]);  
+	                	COST_ENGINEERING = Integer.parseInt(values[4]);  
+	                	COST_MATH = Integer.parseInt(values[5]);  
+	                	COST_ASS = Integer.parseInt(values[6]);  
+	                	COST_RES = Integer.parseInt(values[7]); 
+	            		
+	            		in.close();
+	            		
+	            		System.out.println("Data loaded from file instead of server.");
+            		}catch(IOException excp){
+            			excp.printStackTrace();
+            		}
+            	}else{ //file does not exist
+            		System.out.println("Cannot connect to server and local data cannot be found. Exiting.");
+            		System.exit(1);
+            	}
+            }
         }
 	}
 }
