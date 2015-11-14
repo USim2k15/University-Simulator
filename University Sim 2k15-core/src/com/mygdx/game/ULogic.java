@@ -27,7 +27,7 @@ public class ULogic {
 	Date date;
 	SimpleDateFormat ft;
 	
-	final double DAYS_PER_FRAME = 0.1; //this actually doesn't have to be final, we can let the user change it to fast forward
+	static double gameSpeed = 0.1; //this actually doesn't have to be final, we can let the user change it to fast forward
 	
 	//background
 	Texture t_bg;
@@ -36,20 +36,21 @@ public class ULogic {
 	Texture t_admin1, t_admin2, t_compSci, t_genSci, t_engineering, t_math, t_ass, t_res, t_test1;
 	Texture t_adminfull; //only used by building selector
 	//UI
-	Texture t_stats, t_quit, t_slider;
+	static Texture t_stats, t_quit, t_slider, t_menuGeneral;
 	
 	//Sprite lists
 	List<Building> buildings;
 	List<Slider> sliders;
 	List<TextDisplay> statsFonts;
 	List<TextDisplay> selectorFonts;
+	List<Menu> menus;
 	
 	Twit twit;
 	
 	//Money
-	int money, students, capacity, tuition, happiness, targetStudents, upkeep;
+	static int money, students, capacity, tuition, happiness, targetStudents, upkeep;
 	
-	double TUITION_MAX;
+	static double TUITION_MAX;
 	int COST_ADMIN, COST_COMPSCI, COST_GENSCI, COST_ENGINEERING, COST_MATH, COST_ASS, COST_RES;
 	
 	//random twits vars
@@ -101,6 +102,7 @@ public class ULogic {
 		
 		//UI
 		t_slider = new Texture(Gdx.files.internal("data/slider.png"));
+		t_menuGeneral = new Texture(Gdx.files.internal("data/gen_menu.jpg"));
 		//t_stats = new Texture("stats.png");
 		//t_quit = new Texture("quit.png");
 	}
@@ -122,6 +124,7 @@ public class ULogic {
 		sliders = new ArrayList<Slider>();
 		statsFonts = new ArrayList<TextDisplay>();
 		selectorFonts = new ArrayList<TextDisplay>();
+		menus = new ArrayList<Menu>();
 		
 		
 		//add text
@@ -130,11 +133,8 @@ public class ULogic {
 		statsFonts.add(new TextDisplay("Capacity: " + Integer.toString(capacity), 930, 150, 330, 2, Color.BLACK, 1)); //statsFonts.get(2)
 		statsFonts.add(new TextDisplay("Happiness: " + Integer.toString(happiness), 930, 50, 330, 2, Color.BLACK, 1)); //statsFonts.get(3)
 		statsFonts.add(new TextDisplay(ft.format(date), 10, 710, 330, 1.5f, Color.WHITE, -1)); //statsFonts.get(4)
-		statsFonts.add(new TextDisplay("$ " + tuition, 540, 715, 0, 2, Color.WHITE, -1)); //statsFonts.get(5)
 		
-		statsFonts.add(new TextDisplay("Tuition: ", 400, 715, 0, 2, Color.WHITE, 0)); //eventually should be in some kind of menu fonts
-		sliders.add(new Slider(t_slider, 400, 687, 100));
-		sliders.get(0).setPos(tuition / TUITION_MAX);
+		//menus.add(new Menu(Menu.MenuType.GENERAL, 100, 520));
 	}
 	
 	public void loop(){ //called in USim2k15::render()
@@ -144,9 +144,17 @@ public class ULogic {
 		targetStudents = capacity*(50+happiness)/150;
 		if(targetStudents < 0) targetStudents = 0;
 		
-		tuition = (int)( (sliders.get(0).getPos()) * TUITION_MAX);
+		//update active menu data
+		for(int i = 0; i < menus.size(); i++){
+			if(menus.get(i).type == Menu.MenuType.GENERAL)
+				tuition = (int)( (menus.get(i).sliders.get(0).getPos()) * TUITION_MAX);
+				menus.get(0).fonts.get(1).text = "$ " + tuition;
+				
+				gameSpeed = menus.get(i).sliders.get(1).getPos();
+				menus.get(0).fonts.get(3).text = "" + gameSpeed;
+		}
 		
-		money += (tuition*students) / (365/DAYS_PER_FRAME);
+		money += (tuition*students) / (365/gameSpeed);
 		money -= upkeep; //can multiple if crazy
 		
 		NumberFormat nf = NumberFormat.getInstance();
@@ -157,7 +165,6 @@ public class ULogic {
 		statsFonts.get(2).text = "Capacity: " + Integer.toString(capacity);
 		statsFonts.get(3).text = "Happiness: " + Integer.toString(happiness);
 		statsFonts.get(4).text = ft.format(date);
-		statsFonts.get(5).text = "$ " + tuition;
 		
 		//new twit message every random amount of time
 		if(randit_twit == rand_twit){
@@ -179,7 +186,7 @@ public class ULogic {
 		
 		handleInput();
 		
-		date.setTime(date.getTime() + (long)(8.64e+7 * DAYS_PER_FRAME)); 
+		date.setTime(date.getTime() + (long)(8.64e+7 * gameSpeed)); 
 	}
 	
 	public List<Sprite> getSprites(){ //called by USim2k15, compiles list of sprites to draw each loop
@@ -188,7 +195,13 @@ public class ULogic {
 		sprites.add(new Sprite(t_overlay,0,0));
 		sprites.addAll(buildings);
 		sprites.addAll(sliders);
-		//sprites.addAll(menus);
+		
+		//menu stuff
+		for(int i = 0; i < menus.size(); i++){
+			Menu current = menus.get(i);
+			sprites.add(new Sprite(current.getT(), current.getX(), current.getY()));
+			sprites.addAll(current.sliders);
+		}
 		
 		if(buildingSelector == 1)
 			sprites.add(new Sprite(t_adminfull, 243, 110));
@@ -203,6 +216,11 @@ public class ULogic {
 		fonts.addAll(statsFonts);
 		fonts.addAll(selectorFonts);
 		fonts.addAll(twit.twitFonts);
+		
+		for(int i = 0; i < menus.size(); i++){
+			Menu current = menus.get(i);
+			fonts.addAll(current.fonts);
+		}
 		
 		return fonts;
 	}
@@ -276,19 +294,38 @@ public class ULogic {
 			money+=1000000000;
 		}
 		
+		//G -> open general menu
+		if(Gdx.input.isKeyJustPressed(Input.Keys.G)){
+			boolean general = false;
+			for(int i = 0; i < menus.size(); i++){
+				if(menus.get(i).type == Menu.MenuType.GENERAL){
+					menus.remove(i);
+					general = true;
+					break; //general menu found
+				}
+			}
+			
+			if(!general)
+				//no menus are general
+				menus.add(new Menu(Menu.MenuType.GENERAL, 100, 520));
+		}
 		
+		//F -> fullscreen
 		if(Gdx.input.isKeyJustPressed(Input.Keys.F)){
 			Gdx.graphics.setDisplayMode(1280, 720, true);
 		}
 		
+		//ESC -> escape fullscreen
 		if(Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)){
 			Gdx.graphics.setDisplayMode(1280, 720, false);
 		}
 		
+		//S -> save game state
 		if(Gdx.input.isKeyJustPressed(Input.Keys.S)){
 			saveData();
 		}
 		
+		//R -> restart game (kind of dev tool, delete after alpha)
 		if(Gdx.input.isKeyJustPressed(Input.Keys.R)){
 			money = 1000000;
 			upkeep = 0;
@@ -358,11 +395,14 @@ public class ULogic {
 			int mx = Gdx.input.getX();
 			int my = Gdx.input.getY();
 			//check and handle sliders
-			for(int i = 0; i < sliders.size(); i++){
-				int curx = sliders.get(i).getX();
-				int cury = 720 - sliders.get(i).getY(); //flip y to compare to mouse
-				if(my >= cury-30 && my < cury && mx > curx && mx < curx + 30){
-					sliders.get(i).slide(mx);
+			for(int i = 0; i < menus.size(); i++){
+				Menu current = menus.get(i);
+				for(int j = 0; j < current.sliders.size(); j++){
+					int curx = current.sliders.get(j).getX();
+					int cury = 720 - current.sliders.get(j).getY(); //flip y to compare to mouse
+					if(my >= cury-30 && my < cury && mx > curx && mx < curx + 30){
+						current.sliders.get(j).slide(mx);
+					}
 				}
 			}
 		}
