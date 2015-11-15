@@ -37,15 +37,17 @@ public class ULogic {
 	Texture t_adminfull; //only used by building selector
 	//UI
 	static Texture t_stats, t_quit, t_slider, t_menuGeneral;
+	static Texture t_dashGen, t_dashGen_s;
 	
 	//Sprite lists
 	List<Building> buildings;
 	List<Slider> sliders;
 	List<TextDisplay> statsFonts;
 	List<TextDisplay> selectorFonts;
-	List<Menu> menus;
 	
 	Twit twit;
+	
+	Menu menu;
 	
 	//Money
 	static int money, students, capacity, tuition, happiness, targetStudents, upkeep;
@@ -103,6 +105,8 @@ public class ULogic {
 		//UI
 		t_slider = new Texture(Gdx.files.internal("data/slider.png"));
 		t_menuGeneral = new Texture(Gdx.files.internal("data/gen_menu.jpg"));
+		t_dashGen = new Texture(Gdx.files.internal("data/dash_gen.png"));
+		t_dashGen_s = new Texture(Gdx.files.internal("data/dash_gen_s.png"));
 		//t_stats = new Texture("stats.png");
 		//t_quit = new Texture("quit.png");
 	}
@@ -124,7 +128,7 @@ public class ULogic {
 		sliders = new ArrayList<Slider>();
 		statsFonts = new ArrayList<TextDisplay>();
 		selectorFonts = new ArrayList<TextDisplay>();
-		menus = new ArrayList<Menu>();
+		menu = new Menu();
 		
 		
 		//add text
@@ -145,17 +149,16 @@ public class ULogic {
 		if(targetStudents < 0) targetStudents = 0;
 		
 		//update active menu data
-		for(int i = 0; i < menus.size(); i++){
-			if(menus.get(i).type == Menu.MenuType.GENERAL)
-				tuition = (int)( (menus.get(i).sliders.get(0).getPos()) * TUITION_MAX);
-				menus.get(0).fonts.get(1).text = "$ " + tuition;
-				
-				gameSpeed = menus.get(i).sliders.get(1).getPos();
-				menus.get(0).fonts.get(3).text = "" + gameSpeed;
+		if(menu.type == Menu.MenuType.GENERAL){
+			tuition = (int)( (menu.sliders.get(0).getPos()) * TUITION_MAX);
+			menu.fonts.get(1).text = "$ " + tuition;
+			
+			gameSpeed = menu.sliders.get(1).getPos();
+			menu.fonts.get(3).text = "" + gameSpeed;
 		}
 		
 		money += (tuition*students) / (365/gameSpeed);
-		money -= upkeep; //can multiple if crazy
+		money -= upkeep * gameSpeed; //can multiple if crazy
 		
 		NumberFormat nf = NumberFormat.getInstance();
 		nf.setGroupingUsed(true);
@@ -196,12 +199,8 @@ public class ULogic {
 		sprites.addAll(buildings);
 		sprites.addAll(sliders);
 		
-		//menu stuff
-		for(int i = 0; i < menus.size(); i++){
-			Menu current = menus.get(i);
-			sprites.add(new Sprite(current.getT(), current.getX(), current.getY()));
-			sprites.addAll(current.sliders);
-		}
+		sprites.addAll(menu.navs);
+		sprites.addAll(menu.sliders);
 		
 		if(buildingSelector == 1)
 			sprites.add(new Sprite(t_adminfull, 243, 110));
@@ -216,11 +215,7 @@ public class ULogic {
 		fonts.addAll(statsFonts);
 		fonts.addAll(selectorFonts);
 		fonts.addAll(twit.twitFonts);
-		
-		for(int i = 0; i < menus.size(); i++){
-			Menu current = menus.get(i);
-			fonts.addAll(current.fonts);
-		}
+		fonts.addAll(menu.fonts);
 		
 		return fonts;
 	}
@@ -295,6 +290,7 @@ public class ULogic {
 		}
 		
 		//G -> open general menu
+		/*
 		if(Gdx.input.isKeyJustPressed(Input.Keys.G)){
 			boolean general = false;
 			for(int i = 0; i < menus.size(); i++){
@@ -308,7 +304,7 @@ public class ULogic {
 			if(!general)
 				//no menus are general
 				menus.add(new Menu(Menu.MenuType.GENERAL, 100, 520));
-		}
+		}*/
 		
 		//F -> fullscreen
 		if(Gdx.input.isKeyJustPressed(Input.Keys.F)){
@@ -395,14 +391,11 @@ public class ULogic {
 			int mx = Gdx.input.getX();
 			int my = Gdx.input.getY();
 			//check and handle sliders
-			for(int i = 0; i < menus.size(); i++){
-				Menu current = menus.get(i);
-				for(int j = 0; j < current.sliders.size(); j++){
-					int curx = current.sliders.get(j).getX();
-					int cury = 720 - current.sliders.get(j).getY(); //flip y to compare to mouse
-					if(my >= cury-30 && my < cury && mx > curx && mx < curx + 30){
-						current.sliders.get(j).slide(mx);
-					}
+			for(int j = 0; j < menu.sliders.size(); j++){
+				int curx = menu.sliders.get(j).getX();
+				int cury = 720 - menu.sliders.get(j).getY(); //flip y to compare to mouse
+				if(my >= cury-30 && my < cury && mx > curx && mx < curx + 30){
+					menu.sliders.get(j).slide(mx);
 				}
 			}
 		}
@@ -410,6 +403,8 @@ public class ULogic {
 	
 	public void handleClick(int clickx, int clicky){ //called from handleInput() //coordinates are topleft index!
 
+		if(clickx > menu.OFFSET_X && clickx < menu.OFFSET_X + 487 && clicky > 720 - menu.OFFSET_Y - menu.NAV_HEIGHT && clicky < 720 - menu.OFFSET_Y)
+			menu.handleClick(clickx, clicky);
 		
 		if( ((clicky >= 214 && clicky < 278) || (clicky >= 424 && clicky < 488)) && buildingSelector != -1 ){ //clicked somehwere on a plot
 			int itx = 0, ity = 214;

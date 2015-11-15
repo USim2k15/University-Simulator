@@ -14,8 +14,7 @@ public class Slider extends Sprite{
 	}
 	
 	public void setPos(double p){ //p is a decimal 0 - 1
-		if(p == 0) x = begin;
-		else x = (int)(begin + width*p);
+		x = (int)(begin + width*p);
 	}
 	
 	public double getPos(){ 
