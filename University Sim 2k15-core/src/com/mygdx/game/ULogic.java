@@ -289,23 +289,6 @@ public class ULogic {
 			money+=1000000000;
 		}
 		
-		//G -> open general menu
-		/*
-		if(Gdx.input.isKeyJustPressed(Input.Keys.G)){
-			boolean general = false;
-			for(int i = 0; i < menus.size(); i++){
-				if(menus.get(i).type == Menu.MenuType.GENERAL){
-					menus.remove(i);
-					general = true;
-					break; //general menu found
-				}
-			}
-			
-			if(!general)
-				//no menus are general
-				menus.add(new Menu(Menu.MenuType.GENERAL, 100, 520));
-		}*/
-		
 		//F -> fullscreen
 		if(Gdx.input.isKeyJustPressed(Input.Keys.F)){
 			Gdx.graphics.setDisplayMode(1280, 720, true);
