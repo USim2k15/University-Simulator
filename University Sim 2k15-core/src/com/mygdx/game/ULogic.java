@@ -8,6 +8,7 @@ import com.badlogic.gdx.Input;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.Date;
@@ -27,7 +28,7 @@ public class ULogic {
 	Date date;
 	SimpleDateFormat ft;
 	
-	static double gameSpeed = 0.1; //this actually doesn't have to be final, we can let the user change it to fast forward
+	static double gameSpeed = 0.1;
 	
 	//background
 	Texture t_bg;
@@ -36,8 +37,9 @@ public class ULogic {
 	Texture t_admin1, t_admin2, t_compSci, t_genSci, t_engineering, t_math, t_ass, t_res, t_test1;
 	Texture t_adminfull; //only used by building selector
 	//UI
-	static Texture t_stats, t_quit, t_slider, t_menuGeneral;
-	static Texture t_dashGen, t_dashGen_s;
+	static Texture t_stats, t_quit, t_slider, t_shade;
+	static Texture t_dashGen, t_dashGen_s,
+				   t_dashFin, t_dashFin_s;
 	
 	//Sprite lists
 	List<Building> buildings;
@@ -60,12 +62,15 @@ public class ULogic {
 	
 	//building selector view vars
 	int buildingSelector;
+	int shadex, shadey;
+	boolean shading, selecting;
+	
 	Texture buildingSelectorSprite;
 	
 	//Font
 	BitmapFont font;
 	
-	List<Integer> mapIndex;
+	List<Integer> mapIndex; //make this an array
 	/*
 	 * 0 = nothing
 	 * 1 = admin1
@@ -104,11 +109,12 @@ public class ULogic {
 		
 		//UI
 		t_slider = new Texture(Gdx.files.internal("data/slider.png"));
-		t_menuGeneral = new Texture(Gdx.files.internal("data/gen_menu.jpg"));
+		t_shade = new Texture(Gdx.files.internal("data/shade.png"));
+		
 		t_dashGen = new Texture(Gdx.files.internal("data/dash_gen.png"));
 		t_dashGen_s = new Texture(Gdx.files.internal("data/dash_gen_s.png"));
-		//t_stats = new Texture("stats.png");
-		//t_quit = new Texture("quit.png");
+		t_dashFin = new Texture(Gdx.files.internal("data/dash_fin.png"));
+		t_dashFin_s = new Texture(Gdx.files.internal("data/dash_fin_s.png"));
 	}
 	
 	public void init(){
@@ -142,6 +148,8 @@ public class ULogic {
 	}
 	
 	public void loop(){ //called in USim2k15::render()
+
+		handleInput();
 		
 		compileMap();
 		
@@ -149,13 +157,6 @@ public class ULogic {
 		if(targetStudents < 0) targetStudents = 0;
 		
 		//update active menu data
-		if(menu.type == Menu.MenuType.GENERAL){
-			tuition = (int)( (menu.sliders.get(0).getPos()) * TUITION_MAX);
-			menu.fonts.get(1).text = "$ " + tuition;
-			
-			gameSpeed = menu.sliders.get(1).getPos();
-			menu.fonts.get(3).text = "" + gameSpeed;
-		}
 		
 		money += (tuition*students) / (365/gameSpeed);
 		money -= upkeep * gameSpeed; //can multiple if crazy
@@ -187,7 +188,7 @@ public class ULogic {
 		if(students > capacity) students = capacity;
 		if(students <= 0) students = 0;
 		
-		handleInput();
+		menu.updateDash();
 		
 		date.setTime(date.getTime() + (long)(8.64e+7 * gameSpeed)); 
 	}
@@ -199,7 +200,9 @@ public class ULogic {
 		sprites.addAll(buildings);
 		sprites.addAll(sliders);
 		
-		sprites.addAll(menu.navs);
+		if(selecting&&shading) sprites.add(new Sprite(t_shade,shadex,shadey));
+		
+		sprites.addAll(Arrays.asList(menu.navs));
 		sprites.addAll(menu.sliders);
 		
 		if(buildingSelector == 1)
@@ -316,6 +319,7 @@ public class ULogic {
 		}
 		
 		//building selector (can be done better)
+		selecting = true;
 		String info;
 		if(Gdx.input.isKeyPressed(Input.Keys.NUM_1)){
 			buildingSelector = 1;
@@ -358,11 +362,38 @@ public class ULogic {
 			buildingSelectorSprite = null;
 			info = "Press and hold a number key to build.";
 		}else{
+			selecting = false;
 			buildingSelector = -1;
 			buildingSelectorSprite = null;
 			info = "Press and hold a number key to build.";
 		}
-
+		
+		if(selecting){
+			shading = false;
+			int mousex = Gdx.input.getX();
+			int mousey = Gdx.input.getY();
+			if( ((mousey >= 214 && mousey < 278) || (mousey >= 424 && mousey < 488)) ){
+				int itx = 0, ity = 214;
+				for(int i = 0; i < 40; i++){
+					if(itx >= 1280){
+						itx = 0;
+						ity = 424;
+					}
+					
+					if(mousex >= itx && mousex < itx+64 && mousey >= ity && mousey < ity+64){
+						if(mapIndex.get(i) == 0){ //if it's an empty plot shade it
+							shading = true;
+							shadex = itx;
+							shadey = 656 - ity; //720 - 64
+						}
+						break;
+					}
+					
+					itx+=64;
+				}
+			}
+		}
+		
 		selectorFonts.clear();
 		selectorFonts.add(new TextDisplay(info, 226, 105, 160, 1, Color.BLACK, 1));
 		

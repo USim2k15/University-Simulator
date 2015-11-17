@@ -12,7 +12,8 @@ public class Menu {
 	
 	enum MenuType {
 		NONE,
-		GENERAL
+		GENERAL,
+		FINANCE
 	}
 	
 	MenuType type;
@@ -22,16 +23,16 @@ public class Menu {
 	
 	List<Slider> sliders;
 	List<TextDisplay> fonts;
-	List<Sprite> navs;
+	Sprite[] navs = new Sprite[2]; //up to 5 eventually
 	
 	public Menu(){
 		sliders = new ArrayList<Slider>();
 		fonts = new ArrayList<TextDisplay>();
-		navs = new ArrayList<Sprite>();
 		
 		type = MenuType.NONE;
 		
-		navs.add(new Sprite(ULogic.t_dashGen, OFFSET_X, OFFSET_Y));
+		navs[0] = new Sprite(ULogic.t_dashGen, OFFSET_X, OFFSET_Y);
+		navs[1] = new Sprite(ULogic.t_dashFin, OFFSET_X + NAV_WIDTH, OFFSET_Y);
 	}
 	
 	public void handleMouse(int mx){ //only need mx because my is checked prior to calling this
@@ -48,7 +49,7 @@ public class Menu {
 				type = MenuType.NONE;
 				sliders.clear();
 				fonts.clear();
-				navs.get(0).img = ULogic.t_dashGen;
+				navs[0].img = ULogic.t_dashGen;
 			}else{
 			
 				type = MenuType.GENERAL;
@@ -56,24 +57,50 @@ public class Menu {
 				sliders.clear();
 				fonts.clear();
 				
-				navs.get(0).img = ULogic.t_dashGen_s;
-				//img for all others = not _s
+				navs[0].img = ULogic.t_dashGen_s;
+				
+				navs[1].img = ULogic.t_dashFin;
+				
+				fonts.add(new TextDisplay("Speed: ", OFFSET_X + 25, OFFSET_Y - 20, 0, 1.5f, Color.WHITE, -1));
+				sliders.add(new Slider(ULogic.t_slider, OFFSET_X + 100, OFFSET_Y - 45, 100));
+				fonts.add(new TextDisplay("" + ULogic.gameSpeed, OFFSET_X + 250, OFFSET_Y - 20, 0, 1.5f, Color.WHITE, -1));
+				sliders.get(0).setPos(ULogic.gameSpeed);
+			}
+			
+		}else if(mx > OFFSET_X + NAV_WIDTH && mx < OFFSET_X + 2*NAV_WIDTH){
+			if(type == MenuType.FINANCE){
+				type = MenuType.NONE;
+				sliders.clear();
+				fonts.clear();
+				navs[1].img = ULogic.t_dashFin;
+			}else{
+				type = MenuType.FINANCE;
+				
+				sliders.clear();
+				fonts.clear();
+				
+				navs[1].img = ULogic.t_dashFin_s;
+				
+				navs[0].img = ULogic.t_dashGen;
 				
 				fonts.add(new TextDisplay("Tuition: ", OFFSET_X + 25, OFFSET_Y - 20, 0, 1.5f, Color.WHITE, -1));
 				sliders.add(new Slider(ULogic.t_slider, OFFSET_X + 100, OFFSET_Y - 45, 100));
 				fonts.add(new TextDisplay("$ " + ULogic.tuition, OFFSET_X  + 250, OFFSET_Y - 20, 0, 1.5f, Color.WHITE, -1));
 				sliders.get(0).setPos(ULogic.tuition / ULogic.TUITION_MAX);
-				
-				fonts.add(new TextDisplay("Speed: ", OFFSET_X + 25, OFFSET_Y - 75, 0, 1.5f, Color.WHITE, -1));
-				sliders.add(new Slider(ULogic.t_slider, OFFSET_X + 100, OFFSET_Y - 100, 100));
-				fonts.add(new TextDisplay("" + ULogic.gameSpeed, OFFSET_X + 250, OFFSET_Y - 75, 0, 1.5f, Color.WHITE, -1));
-				sliders.get(1).setPos(ULogic.gameSpeed);
 			}
-			
-		}else if(mx > OFFSET_X + NAV_WIDTH && mx < OFFSET_X + 2*NAV_WIDTH){
-			
 		}
 			
+	}
+	
+	public void updateDash(){
+		if(type == MenuType.GENERAL){
+			ULogic.gameSpeed = sliders.get(0).getPos();
+			fonts.get(1).text = (int)(ULogic.gameSpeed*60) + " days / second";
+			
+		}else if(type == MenuType.FINANCE){
+			ULogic.tuition = (int)( (sliders.get(0).getPos()) * ULogic.TUITION_MAX);
+			fonts.get(1).text = "$ " + ULogic.tuition;
+		}
 	}
 	
 	public Texture getT() {return t;}
