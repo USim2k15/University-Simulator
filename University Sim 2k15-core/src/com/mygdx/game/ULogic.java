@@ -350,14 +350,17 @@ public class ULogic {
 			buildingSelectorSprite = t_res;
 			info = "Residence\nPrice: " + COST_RES;
 		}else if(Gdx.input.isKeyPressed(Input.Keys.NUM_8)){
+			selecting = false;
 			buildingSelector = -1;
 			buildingSelectorSprite = null;
 			info = "Press and hold a number key to build.";
 		}else if(Gdx.input.isKeyPressed(Input.Keys.NUM_9)){
+			selecting = false;
 			buildingSelector = -1;
 			buildingSelectorSprite = null;
 			info = "Press and hold a number key to build.";
 		}else if(Gdx.input.isKeyPressed(Input.Keys.NUM_0)){
+			selecting = false;
 			buildingSelector = -1;
 			buildingSelectorSprite = null;
 			info = "Press and hold a number key to build.";
