@@ -40,6 +40,7 @@ public class ULogic {
 	static Texture t_stats, t_quit, t_slider, t_shade;
 	static Texture t_dashGen, t_dashGen_s,
 				   t_dashFin, t_dashFin_s;
+	Texture t_student;
 	
 	//Sprite lists
 	List<Building> buildings;
@@ -47,9 +48,12 @@ public class ULogic {
 	List<TextDisplay> statsFonts;
 	List<TextDisplay> selectorFonts;
 	
+	List<Student> studs;
+	
 	Twit twit;
 	
 	Menu menu;
+	int sliding = -1;
 	
 	//Money
 	static int money, students, capacity, tuition, happiness, targetStudents, upkeep;
@@ -70,7 +74,7 @@ public class ULogic {
 	//Font
 	BitmapFont font;
 	
-	List<Integer> mapIndex; //make this an array
+	static List<Integer> mapIndex; //make this an array
 	/*
 	 * 0 = nothing
 	 * 1 = admin1
@@ -115,6 +119,8 @@ public class ULogic {
 		t_dashGen_s = new Texture(Gdx.files.internal("data/dash_gen_s.png"));
 		t_dashFin = new Texture(Gdx.files.internal("data/dash_fin.png"));
 		t_dashFin_s = new Texture(Gdx.files.internal("data/dash_fin_s.png"));
+		
+		t_student = new Texture(Gdx.files.internal("data/student.png"));
 	}
 	
 	public void init(){
@@ -134,6 +140,9 @@ public class ULogic {
 		sliders = new ArrayList<Slider>();
 		statsFonts = new ArrayList<TextDisplay>();
 		selectorFonts = new ArrayList<TextDisplay>();
+		
+		studs = new ArrayList<Student>();
+		
 		menu = new Menu();
 		
 		
@@ -188,6 +197,8 @@ public class ULogic {
 		if(students > capacity) students = capacity;
 		if(students <= 0) students = 0;
 		
+		renderPeople();
+		
 		menu.updateDash();
 		
 		date.setTime(date.getTime() + (long)(8.64e+7 * gameSpeed)); 
@@ -199,8 +210,12 @@ public class ULogic {
 		sprites.add(new Sprite(t_overlay,0,0));
 		sprites.addAll(buildings);
 		sprites.addAll(sliders);
+		sprites.addAll(studs);
 		
-		if(selecting&&shading) sprites.add(new Sprite(t_shade,shadex,shadey));
+		if(selecting&&shading&&buildingSelector == 1){
+			sprites.add(new Sprite(t_shade,shadex,shadey));
+			sprites.add(new Sprite(t_shade,shadex+64,shadey));
+		}else if(selecting&&shading) sprites.add(new Sprite(t_shade,shadex,shadey));
 		
 		sprites.addAll(Arrays.asList(menu.navs));
 		sprites.addAll(menu.sliders);
@@ -221,6 +236,15 @@ public class ULogic {
 		fonts.addAll(menu.fonts);
 		
 		return fonts;
+	}
+	
+	public void renderPeople(){
+		for(int i = 0; i < studs.size(); i++) 
+			if(studs.get(i).runAround()) //makes them run around, returns true if at destination
+				studs.remove(i);
+		if(buildings.size() > 1)
+			if(ThreadLocalRandom.current().nextInt(0, 100) == 0) 
+				studs.add(new Student(t_student));
 	}
 	
 	public void compileMap(){ //called each loop
@@ -412,10 +436,13 @@ public class ULogic {
 				int curx = menu.sliders.get(j).getX();
 				int cury = 720 - menu.sliders.get(j).getY(); //flip y to compare to mouse
 				if(my >= cury-30 && my < cury && mx > curx && mx < curx + 30){
+					sliding = j;
 					menu.sliders.get(j).slide(mx);
 				}
 			}
-		}
+		}else sliding = -1;
+		
+		if(sliding != -1) menu.sliders.get(sliding).slide(Gdx.input.getX());
 	}
 	
 	public void handleClick(int clickx, int clicky){ //called from handleInput() //coordinates are topleft index!
@@ -468,10 +495,6 @@ public class ULogic {
 				}
 				itx+=64;
 			}
-		}
-		
-		else if(clicky < 200){ //clicked in menu area
-			
 		}
 	}
 	
