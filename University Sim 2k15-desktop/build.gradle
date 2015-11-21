@@ -30,8 +30,12 @@ dist.dependsOn classes
 
 eclipse {
     project {
-        name = appName + "-desktop"
+        name = "University Sim 2k15-desktop"
         linkedResource name: 'assets', type: '2', location: 'PARENT-1-PROJECT_LOC/core/assets'
+        
+        dependencies{
+        	compile "com.badlogicgames.gdx:gdx:1.7.1"
+        }
     }
 }
 

@@ -1,12 +1,16 @@
 apply plugin: "java"
 apply plugin: "eclipse"
 
+
 sourceCompatibility = 1.6
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 sourceSets.main.java.srcDirs = [ "src/" ]
 
-
 eclipse.project {
-    name = appName + "-core"
+    name = "University Sim 2k15-core"
+    
+    dependencies{
+    	compile "com.badlogicgames.gdx:gdx:1.7.1"
+    }
 }
