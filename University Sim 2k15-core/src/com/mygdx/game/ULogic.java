@@ -52,7 +52,7 @@ public class ULogic {
 	
 	Twit twit;
 	
-	Menu menu;
+	Dash dash;
 	int sliding = -1;
 	
 	//Money
@@ -143,7 +143,7 @@ public class ULogic {
 		
 		studs = new ArrayList<Student>();
 		
-		menu = new Menu();
+		dash = new Dash();
 		
 		
 		//add text
@@ -199,7 +199,7 @@ public class ULogic {
 		
 		renderPeople();
 		
-		menu.updateDash();
+		dash.updateDash(); //does this need to be called every loop?
 		
 		date.setTime(date.getTime() + (long)(8.64e+7 * gameSpeed)); 
 	}
@@ -217,8 +217,8 @@ public class ULogic {
 			sprites.add(new Sprite(t_shade,shadex+64,shadey));
 		}else if(selecting&&shading) sprites.add(new Sprite(t_shade,shadex,shadey));
 		
-		sprites.addAll(Arrays.asList(menu.navs));
-		sprites.addAll(menu.sliders);
+		sprites.addAll(Arrays.asList(dash.navs));
+		sprites.addAll(dash.sliders);
 		
 		if(buildingSelector == 1)
 			sprites.add(new Sprite(t_adminfull, 243, 110));
@@ -233,7 +233,7 @@ public class ULogic {
 		fonts.addAll(statsFonts);
 		fonts.addAll(selectorFonts);
 		fonts.addAll(twit.twitFonts);
-		fonts.addAll(menu.fonts);
+		fonts.addAll(dash.fonts);
 		
 		return fonts;
 	}
@@ -432,23 +432,23 @@ public class ULogic {
 			int mx = Gdx.input.getX();
 			int my = Gdx.input.getY();
 			//check and handle sliders
-			for(int j = 0; j < menu.sliders.size(); j++){
-				int curx = menu.sliders.get(j).getX();
-				int cury = 720 - menu.sliders.get(j).getY(); //flip y to compare to mouse
+			for(int j = 0; j < dash.sliders.size(); j++){
+				int curx = dash.sliders.get(j).getX();
+				int cury = 720 - dash.sliders.get(j).getY(); //flip y to compare to mouse
 				if(my >= cury-30 && my < cury && mx > curx && mx < curx + 30){
 					sliding = j;
-					menu.sliders.get(j).slide(mx);
+					dash.sliders.get(j).slide(mx);
 				}
 			}
 		}else sliding = -1;
 		
-		if(sliding != -1) menu.sliders.get(sliding).slide(Gdx.input.getX());
+		if(sliding != -1) dash.sliders.get(sliding).slide(Gdx.input.getX());
 	}
 	
 	public void handleClick(int clickx, int clicky){ //called from handleInput() //coordinates are topleft index!
 
-		if(clickx > menu.OFFSET_X && clickx < menu.OFFSET_X + 487 && clicky > 720 - menu.OFFSET_Y - menu.NAV_HEIGHT && clicky < 720 - menu.OFFSET_Y)
-			menu.handleClick(clickx, clicky);
+		if(clickx > dash.OFFSET_X && clickx < dash.OFFSET_X + 487 && clicky > 720 - dash.OFFSET_Y - dash.NAV_HEIGHT && clicky < 720 - dash.OFFSET_Y)
+			dash.handleClick(clickx, clicky);
 		
 		if( ((clicky >= 214 && clicky < 278) || (clicky >= 424 && clicky < 488)) && buildingSelector != -1 ){ //clicked somehwere on a plot
 			int itx = 0, ity = 214;
@@ -617,7 +617,7 @@ public class ULogic {
 		if(local)
 			client = new ServerData ("192.168.2.13", 1615);
 		else
-			client = new ServerData ("142.177.105.129", 1615);
+			client = new ServerData ("usim.nickbis.me", 1615);
 
         try {
             //trying to establish connection to the server
