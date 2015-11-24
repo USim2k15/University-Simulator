@@ -48,7 +48,7 @@ public class ULogic {
 	List<TextDisplay> statsFonts;
 	List<TextDisplay> selectorFonts;
 	
-	List<Student> studs;
+	List<Penguin> penguins;
 	
 	Twit twit;
 	
@@ -141,7 +141,7 @@ public class ULogic {
 		statsFonts = new ArrayList<TextDisplay>();
 		selectorFonts = new ArrayList<TextDisplay>();
 		
-		studs = new ArrayList<Student>();
+		penguins = new ArrayList<Penguin>();
 		
 		dash = new Dash();
 		
@@ -161,6 +161,8 @@ public class ULogic {
 		handleInput();
 		
 		compileMap();
+		
+		happiness = (int)(100 - 50*(tuition/TUITION_MAX));
 		
 		targetStudents = capacity*(50+happiness)/150;
 		if(targetStudents < 0) targetStudents = 0;
@@ -197,7 +199,7 @@ public class ULogic {
 		if(students > capacity) students = capacity;
 		if(students <= 0) students = 0;
 		
-		renderPeople();
+		releasePenguins();
 		
 		dash.updateDash(); //does this need to be called every loop?
 		
@@ -210,7 +212,7 @@ public class ULogic {
 		sprites.add(new Sprite(t_overlay,0,0));
 		sprites.addAll(buildings);
 		sprites.addAll(sliders);
-		sprites.addAll(studs);
+		sprites.addAll(penguins);
 		
 		if(selecting&&shading&&buildingSelector == 1){
 			sprites.add(new Sprite(t_shade,shadex,shadey));
@@ -238,13 +240,13 @@ public class ULogic {
 		return fonts;
 	}
 	
-	public void renderPeople(){
-		for(int i = 0; i < studs.size(); i++) 
-			if(studs.get(i).runAround()) //makes them run around, returns true if at destination
-				studs.remove(i);
+	public void releasePenguins(){
+		for(int i = 0; i < penguins.size(); i++) 
+			if(penguins.get(i).releaseThePenguins()) //makes them run around, returns true if at destination
+				penguins.remove(i);
 		if(buildings.size() > 1)
 			if(ThreadLocalRandom.current().nextInt(0, 100) == 0) 
-				studs.add(new Student(t_student));
+				penguins.add(new Penguin(t_student));
 	}
 	
 	public void compileMap(){ //called each loop

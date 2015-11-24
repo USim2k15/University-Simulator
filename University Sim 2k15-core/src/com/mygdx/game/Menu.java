@@ -73,7 +73,7 @@ public class Menu {
 	public void handleClick(int clickx, int clicky){
 		clicky = 720 - clicky;
 		for(Button b : buttons){
-			if(clickx > b.x && clickx < b.x + b.width && clicky > b.y && clicky < b.y + b.width){
+			if(clickx > b.getX() && clickx < b.getX() + b.getWidth() && clicky > b.getY() && clicky < b.getY() + b.getWidth()){
 				if(b.type == Button.ButtonType.START) USim2k15.state = USim2k15.State.GAME;
 				else if(b.type == Button.ButtonType.OPTIONS) ; //deal with options
 			}

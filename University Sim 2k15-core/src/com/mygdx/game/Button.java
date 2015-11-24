@@ -3,8 +3,8 @@ package com.mygdx.game;
 import com.badlogic.gdx.graphics.Texture;
 
 public class Button extends Sprite {
-	Texture t, hover;
-	int x, y, width, height;
+	private Texture t, hover;
+	private int width, height;
 	ButtonType type;
 	
 	enum ButtonType{
@@ -28,5 +28,23 @@ public class Button extends Sprite {
 		my = 720 - my; //invert my
 		if(mx > x && mx < x + width && my > y && my < y + height) img = hover;
 		else img = t;
+	}
+
+	
+	//getters and setters
+	public int getWidth() {
+		return width;
+	}
+
+	public void setWidth(int width) {
+		this.width = width;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
+	public void setHeight(int height) {
+		this.height = height;
 	}
 }

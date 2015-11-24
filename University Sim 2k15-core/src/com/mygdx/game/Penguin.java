@@ -5,11 +5,11 @@ import java.util.List;
 
 import com.badlogic.gdx.graphics.Texture;
 
-public class Student extends Sprite {
+public class Penguin extends Sprite {
 	
 	int xdest, ydest;
 	
-	public Student(Texture t){
+	public Penguin(Texture t){
 		super(t, 0, 0); //x and y will be decided internally
 		init();
 	}
@@ -45,7 +45,7 @@ public class Student extends Sprite {
 		}
 	}
 	
-	public boolean runAround(){ //returns true if at destination
+	public boolean releaseThePenguins(){ //returns true if at destination
 		if(x > xdest) x--; else if(x < xdest) x++;
 		if(y > ydest) y--; else if(y < ydest) y++;
 		if(x == xdest && y == ydest) return true;
