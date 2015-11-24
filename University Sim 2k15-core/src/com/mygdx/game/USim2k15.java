@@ -16,14 +16,25 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.graphics.Texture;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.mygdx.game.ULogic;
 
 public class USim2k15 extends ApplicationAdapter {
+	enum State{
+		NONE,
+		MENU,
+		GAME
+	}
+	
+	static State state;
+	State oldState;
+	
 	SpriteBatch batch;
 	
-	ULogic uLogic;
+	static ULogic uLogic;
+	static Menu menu;
 	
 	private BitmapFont font;
 	
@@ -37,22 +48,22 @@ public class USim2k15 extends ApplicationAdapter {
 	@Override
 	public void create () {
 		
-		long start = TimeUtils.millis();
-		
 		splashTimer = TimeUtils.millis() + SPLASH_TIME;
 		
 		splash = new Texture(Gdx.files.internal("data/splash.jpg"));
 		
-		uLogic = new ULogic();
+		oldState = State.NONE;
+		state = State.MENU;
+		
 		batch = new SpriteBatch();
 		font = new BitmapFont();
-		
-		System.out.println("Startup took " + (TimeUtils.millis() - start) + " milliseconds.");
+
 	}
 
 	@Override
 	public void render () {
 		
+		//splash screen
 		if(TimeUtils.millis() - splashTimer < 0){
 			
 			batch.begin();
@@ -66,12 +77,36 @@ public class USim2k15 extends ApplicationAdapter {
 			return;
 		}
 		
+		//game
+		
+		List<Sprite> sprites = new ArrayList<Sprite>();
+		List<TextDisplay> fonts = new ArrayList<TextDisplay>();
+		
+		//retrieve data based on state
+		if(state == State.GAME){
+			if(state != oldState){ //if state switched, initialize
+				oldState = state;
+				uLogic = new ULogic();
+			}
+			
+			uLogic.loop();
+			
+			sprites = uLogic.getSprites();
+			fonts = uLogic.getFonts();
+		}else if(state == State.MENU){
+			if(state != oldState){ //if state switched, initialize
+				oldState = state;
+				menu = new Menu();
+			}
+			
+			menu.loop();
+			
+			sprites = menu.getSprites();
+			//no fonts in menu yet.
+		}
+		
+		//draw everything
 		batch.setColor(Color.WHITE);
-		
-		uLogic.loop();
-		
-		List<Sprite> sprites = uLogic.getSprites();
-		List<TextDisplay> fonts = uLogic.getFonts();
 		
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
