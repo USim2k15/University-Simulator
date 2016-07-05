@@ -1,7 +1,7 @@
 University Simulator
 ====================
 
-The next big simulator, of course.
+This game was developed by Nick Burris and Liam Hartery for the Dalhousie Faculty of Computer Science Game Jam in Fall 2015. 
 
 Downloads
 ---------
