@@ -1,7 +1,7 @@
 University Simulator
 ====================
 
-This game was developed by Nick Burris and Liam Hartery for the Dalhousie Faculty of Computer Science Game Jam in Fall 2015. 
+This game was developed by Nick Burris and Liam Hartery for the Dalhousie Faculty of Computer Science Game Jam in Fall 2015. The game jam was a 48 hour sprint to make a game, and University Simulator hasn't had much development since then. It was a lot of fun to make and hopefully it can be improved in the future!
 
 Downloads
 ---------
